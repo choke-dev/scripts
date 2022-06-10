@@ -1,6 +1,5 @@
 --[[
 
-
 	Hunted Man
 
 ]]
@@ -10,7 +9,7 @@ if getgenv().Connections then
 	for i,v in ipairs(getgenv().Connections) do
 		v:Disconnect()
 	end
-	notify("☁️➡💾", "Script updated.")
+	notify("☁️ >>> 💾", "Script updated.")
 end
 
 getgenv().Connections = {}
@@ -24,26 +23,27 @@ local ESPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/cho
 -- // Variables \\ --
 local Target
 local inGame
+local LPDied
 local UnsupportedModes = {"Contacts"}
 
 -- // Functions \\ --
-local function highlightPlayer(playerName)
-	ESPModule.Create2DESP(Players[tostring(playerName)].Character.Head, "\nTarget: "..Players[tostring(playerName)].DisplayName, Color3.fromRGB(136, 0, 255))
+local function highlightPlayer(playerName, color)
+	ESPModule.Create2DESP(Players[tostring(playerName)].Character.Head, "\nTarget: "..Players[tostring(playerName)].DisplayName, color or Color3.fromRGB(136, 0, 255))
 end
 
 local function scanForNewTarget()
 	pcall(function()
-		notify("ℹ", "Attempting to search for target...")
+		--notify("ℹ", "Attempting to search for target...")
 		Target = workspace.Events.GetTargetLocal:InvokeServer()
 
-		if Target == nil or Target == Players.LocalPlayer.Name then return notify("❌", "No target found.") end
-		if not inGame then return notify("❌", "Not in-game, stopping scan.") end
+		if Target == nil or Target == Players.LocalPlayer.Name then return end
+		if not inGame then return end
 
 		highlightPlayer(tostring(Target))
-		notify("✅", "Found target: "..Players[tostring(Target)].DisplayName)
+		--notify("✅", "Found target: "..Players[tostring(Target)].DisplayName)
 
 		local DiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
-			notify("⚠️", "Target died, Scanning for new target...")
+			--notify("⚠️", "Target died, Scanning for new target...")
 			scanForNewTarget()
 			DiedTrigger:Disconnect()
 		end)
@@ -67,13 +67,22 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 		scanForNewTarget()
 	else
 		inGame = false
-		notify("❌", "Not in-game, stopping scan.")
 	end
+	LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+		inGame = false
+		--notify("❌", "You died!")
+		LPDied:Disconnect()
+	end)
 end))
 
+LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
+	inGame = false
+	--notify("❌", "You died!")
+	LPDied:Disconnect()
+end)
+
+table.insert(getgenv().Connections, LPDied)
+
 -- // Main \\ --
-if not getgenv().Connections then
-	notify("✅", "Script loaded.")
-end
 checkInGameState()
 scanForNewTarget()
