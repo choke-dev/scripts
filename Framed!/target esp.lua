@@ -1,3 +1,10 @@
+--[[
+
+
+	Hunted Man
+
+]]
+
 local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
 if getgenv().Connections then
 	for i,v in ipairs(getgenv().Connections) do
@@ -45,6 +52,14 @@ local function scanForNewTarget()
 	end)
 end
 
+local function checkInGameState()
+	if Players.LocalPlayer.Character:WaitForChild("CharacterAttributes", 2) then
+		inGame = true
+	else
+		inGame = false
+	end
+end
+
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	if character:WaitForChild("CharacterAttributes", 2) then -- checks if the localplayer is in game
@@ -60,4 +75,5 @@ end))
 if not getgenv().Connections then
 	notify("✅", "Script loaded.")
 end
+checkInGameState()
 scanForNewTarget()
