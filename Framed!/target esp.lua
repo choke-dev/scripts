@@ -7,6 +7,7 @@
 	A: Here's a list of the following gamemodes that this script works in:
 		- Framed
 		- Contacts
+		- No Secrets
 
 	Q: Why did you make this script even though theres already a script that does the same thing???
 	A: That other script was broken and wasn't working properly. This script does!
@@ -38,7 +39,6 @@ end)
 
 -- // Variables \\ --
 local Target
-local Role
 local inGame
 local LPDied
 local PPTriggered
@@ -53,7 +53,6 @@ local function scanForNewTarget()
 	pcall(function()
 		notify("🔎", "Attempting to search for target...")
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
-		Role = tostring(workspace.Events.GetRoleLocal)
 
 		if not inGame then return notify("❌", "Cannot start scan, You are not in-game.") end
 		if Target == nil or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
