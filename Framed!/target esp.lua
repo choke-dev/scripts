@@ -36,7 +36,7 @@ local Target
 local inGame
 local LPDied
 local PPTriggered
-local DiedTrigger
+local TargetDiedTrigger
 
 -- // Functions \\ --
 local function highlightPlayer(playerName, color)
@@ -48,27 +48,20 @@ local function scanForNewTarget()
 		notify("🔎", "Attempting to search for target...")
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
 
+		if not inGame then return notify("❌", "Cannot start scan, You are not in-game.") end
 		if Target == nil or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
-		if not inGame then return end
 
 		highlightPlayer(tostring(Target))
-		notify("✅", "Found target: "..Players[tostring(Target)].DisplayName)
+		notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
 
-		DiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
+		TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
 			notify("⚠️", "Target died, Attempting to scan for new target...")
-			DiedTrigger:Disconnect()
-			PPTriggered:Disconnect()
+			TargetDiedTrigger:Disconnect()
 			scanForNewTarget()
 		end)
 
-		PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
-			if prompt.ActionText == "Get Target" and prompt.ObjectText == "Contact" then
-				scanForNewTarget()
-			end
-		end)
+		table.insert(getgenv().Connections, TargetDiedTrigger)
 
-		table.insert(getgenv().Connections, DiedTrigger)
-		table.insert(getgenv().Connections, PPTriggered)
 	end)
 end
 
@@ -84,14 +77,12 @@ end
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
 		LPDied:Disconnect()
-		PPTriggered:Disconnect()
-		DiedTrigger:Disconnect()
+		TargetDiedTrigger:Disconnect()
 	end)
 
 	LPDied = Players.LocalPlayer.Character:WaitForChild("Humanoid", 5).Died:Connect(function()
 		inGame = false
-		notify("❌", "You died!")
-		PPTriggered:Disconnect()
+		notify("❌", "Scanning stopped, You died.")
 		LPDied:Disconnect()
 	end)
 
@@ -99,21 +90,22 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 
 	if inGame then
 		scanForNewTarget()
-		PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
-			if prompt.ActionText == "Get Target" and prompt.ObjectText == "Contact" then
-				scanForNewTarget()
-			end
-		end)
 	end
 end))
 
 LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
 	inGame = false
-	notify("❌", "You died!")
-	PPTriggered:Disconnect()
+	notify("❌", "Scanning stopped, You died.")
 	LPDied:Disconnect()
 end)
+
+PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
+	if prompt.ActionText == "Get Target" and prompt.ObjectText == "Contact" then
+		scanForNewTarget()
+	end
+end)
 table.insert(getgenv().Connections, LPDied)
+table.insert(getgenv().Connections, PPTriggered)
 
 -- // Main \\ --
 notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
