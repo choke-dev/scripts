@@ -1,10 +1,14 @@
 --[[
 
+	Framed! Target ESP
+
 	FAQ:
 	Q: What gamemodes does this work in?
 	A: Here's a list of the following gamemodes that this script works in:
 		- Framed
 		- Contacts
+
+	Q: Why did you make another 
 
 ]]
 getgenv().FramedTESP_Notifications = true
@@ -84,6 +88,7 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 		inGame = false
 		notify("❌", "Scanning stopped, You died.")
 		LPDied:Disconnect()
+		TargetDiedTrigger:Disconnect()
 	end)
 
 	checkInGameState()
@@ -97,6 +102,7 @@ LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
 	inGame = false
 	notify("❌", "Scanning stopped, You died.")
 	LPDied:Disconnect()
+	TargetDiedTrigger:Disconnect()
 end)
 
 PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
