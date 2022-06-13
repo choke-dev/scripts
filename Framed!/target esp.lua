@@ -156,3 +156,4 @@ notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
 checkInGameState()
 scanForNewTarget()
 ESP:Toggle(true)
+ESP.Players = false
