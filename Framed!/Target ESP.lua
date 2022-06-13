@@ -12,8 +12,10 @@
 	Q: Why did you make this script even though theres already a script that does the same thing???
 	A: That other script was broken and wasn't working properly. This script does!
 
+	Q: How do i turn off notifications?
+        A: getgenv().FramedTESP_Notifications = false
+
 ]]
-getgenv().FramedTESP_Notifications = true
 local start = tick()
 local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) if not getgenv().FramedTESP_Notifications then return end Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
 if getgenv().Connections then
@@ -22,7 +24,6 @@ if getgenv().Connections then
 			v:Disconnect()
 		end
 	end)
-	notify("☁️ >>> 💾", "Updating script...")
 end
 
 if getgenv().ESPList then
