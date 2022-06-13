@@ -64,7 +64,7 @@ local SupportedModes = {
 -- // Functions \\ --	
 function AddESP(playerName)
 	ESP.Color = Color3.fromRGB(112, 112, 112)
-    local TEMP_ESP = ESP:Add(Players[playerName].Character.HumanoidRootPart, {
+    local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
         Name = "Target\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
         Color = Color3.fromRGB(255, 244, 88),
         Player = false,
