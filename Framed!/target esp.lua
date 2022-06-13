@@ -25,39 +25,67 @@ if getgenv().Connections then
 	notify("☁️ >>> 💾", "Updating script...")
 end
 
+if getgenv().ESPList then
+	pcall(function()
+		for i,v in ipairs(getgenv().ESPList) do
+			v:Remove()
+		end
+	end)
+end
+
 getgenv().Connections = {}
+getgenv().ESPList = {}
 
 -- // Services \\ --
 local Players = game:GetService("Players")
 local PPS = game:GetService("ProximityPromptService")
 
 -- // Modules \\ --
-local ESPModule
-pcall(function()
-	ESPModule = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/RE-Script/main/Dependencies/ESP%20Module.lua",true))()
-end)
+local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
 
 -- // Variables \\ --
 local Target
 local inGame
+local currentGameMode
 local LPDied
 local PPTriggered
 local TargetDiedTrigger
+local SupportedModes = {
+	["Framed"] = true,
+	["Contacts"] = true,
+	["No Secrets"] = true,
+	["Hunted Man"] = false,
+	["Impostors"] = false,
+	["Elimination"] = false,
+	["Team Elimination"] = false,
+	["Test"] = false
+}
 
--- // Functions \\ --
-local function highlightPlayer(playerName, color)
-	ESPModule.Create2DESP(Players[tostring(playerName)].Character.Head, "\nTarget: "..Players[tostring(playerName)].DisplayName, color or Color3.fromRGB(136, 0, 255))
+-- // Functions \\ --	
+function AddESP(playerName)
+	ESP.Color = Color3.fromRGB(112, 112, 112)
+    local TEMP_ESP = ESP:Add(Players[playerName].Character.HumanoidRootPart, {
+        Name = "Target\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
+        Color = Color3.fromRGB(255, 244, 88),
+        Player = false,
+        IsEnabled = "FramedTargetESP"
+    })
+	ESP.FramedTargetESP = true
+	table.insert(getgenv().ESPList, TEMP_ESP)
+    return TEMP_ESP
 end
 
 local function scanForNewTarget()
 	pcall(function()
 		notify("🔎", "Attempting to search for target...")
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
+		currentGameMode = workspace.Values.GameMode.Value
 
-		if not inGame then return notify("❌", "Cannot start scan, You are not in-game.") end
+		if not inGame or inGame == nil then return notify("❌", "Cannot start scan, You are not in-game.") end
+		if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.") end
 		if Target == nil or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
 
-		highlightPlayer(tostring(Target))
+		AddESP(Target)
 		notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
 
 		TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
@@ -82,15 +110,19 @@ end
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
+		for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
 	end)
 
 	LPDied = Players.LocalPlayer.Character:WaitForChild("Humanoid", 5).Died:Connect(function()
-		inGame = false
-		notify("❌", "Scanning stopped, You died.")
-		LPDied:Disconnect()
-		TargetDiedTrigger:Disconnect()
+		pcall(function()
+			inGame = false
+			notify("❌", "Scanning stopped, You died.")
+			LPDied:Disconnect()
+			TargetDiedTrigger:Disconnect()
+			for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
+		end)
 	end)
 
 	checkInGameState()
@@ -101,10 +133,13 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 end))
 
 LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
-	inGame = false
-	notify("❌", "Scanning stopped, You died.")
-	LPDied:Disconnect()
-	TargetDiedTrigger:Disconnect()
+	pcall(function()
+		inGame = false
+		notify("❌", "Scanning stopped, You died.")
+		LPDied:Disconnect()
+		TargetDiedTrigger:Disconnect()
+		for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
+	end)
 end)
 
 PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
@@ -120,3 +155,4 @@ notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
 
 checkInGameState()
 scanForNewTarget()
+ESP:Toggle(true)
