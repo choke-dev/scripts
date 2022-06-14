@@ -77,27 +77,26 @@ function AddESP(playerName)
 end
 
 local function scanForNewTarget()
+	notify("🔎", "Attempting to search for target...")
 	pcall(function()
-		notify("🔎", "Attempting to search for target...")
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
 		currentGameMode = workspace.Values.GameMode.Value
-
-		if not inGame or inGame == nil then return notify("❌", "Cannot start scan, You are not in-game.") end
-		if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.") end
-		if Target == nil or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
-
-		AddESP(Target)
-		notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
-
-		TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
-			notify("⚠️", "Target died, Attempting to scan for new target...")
-			TargetDiedTrigger:Disconnect()
-			scanForNewTarget()
-		end)
-
-		table.insert(getgenv().Connections, TargetDiedTrigger)
-
 	end)
+
+	if not inGame or inGame == "nil" then return notify("❌", "Cannot start scan, You are not in-game.") end
+	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
+	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
+
+	AddESP(Target)
+	notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
+
+	TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
+		notify("⚠️", "Target died, Attempting to scan for new target...")
+		TargetDiedTrigger:Disconnect()
+		scanForNewTarget()
+	end)
+
+	table.insert(getgenv().Connections, TargetDiedTrigger)
 end
 
 local function checkInGameState()
@@ -111,7 +110,7 @@ end
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
-		for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
+		for _,v in ipairs() do v:Remove() end
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
 	end)
@@ -122,7 +121,7 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 			notify("❌", "Scanning stopped, You died.")
 			LPDied:Disconnect()
 			TargetDiedTrigger:Disconnect()
-			for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
+			for _,v in ipairs(getgenv().ESPList) do v:Remove() end
 		end)
 	end)
 
@@ -139,7 +138,7 @@ LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
 		notify("❌", "Scanning stopped, You died.")
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
-		for _,v in ipairs(getgenv().ESPList) do v:Disconnect() end
+		for _,v in ipairs(getgenv().ESPList) do v:Remove() end
 	end)
 end)
 
