@@ -52,7 +52,7 @@ local SupportedModes = {
 function AddESP(playerName, text, color)
 	ESP.Color = Color3.fromRGB(112, 112, 112)
     local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
-        Name = text or "Target\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
+        Name = text.."\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
         Color = color or Color3.fromRGB(255, 244, 88),
         Player = false,
         IsEnabled = "FramedTargetESP"
@@ -63,8 +63,10 @@ function AddESP(playerName, text, color)
 end
 
 local function scanForUndercover()
+	if not inGame or inGame == "nil" then return notify("❌", "Cannot scan for undercover, You are not ingame.") end
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
-	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for any undercovers.")repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
+
+	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover.")repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
@@ -74,7 +76,7 @@ local function scanForUndercover()
 			success = true
 		end
 	end
-	if not success then notify("❌", "Didn't find any undercover!") end
+	if not success then notify("❌", "Didn't find an undercover!") end
 end
 
 local function scanForNewTarget()
@@ -89,7 +91,7 @@ local function scanForNewTarget()
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
 	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target!\n\nPerhaps you can't have a target at this time?", 6.5) end
 
-	AddESP(Target)
+	AddESP(Target, "Target")
 	notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
 
 	TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
@@ -111,7 +113,6 @@ end
 
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
-	scanForUndercover()
 	pcall(function()
 		for _,v in ipairs() do v:Remove() end
 		LPDied:Disconnect()
@@ -132,6 +133,7 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 
 	if inGame then
 		scanForNewTarget()
+		scanForUndercover()
 	end
 end))
 
@@ -167,7 +169,9 @@ end
 
 -- // Main \\ --
 notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
+checkInGameState()
 scanForNewTarget()
+scanForUndercover()
 ESP:Toggle(true)
 ESP.Players = false
 
