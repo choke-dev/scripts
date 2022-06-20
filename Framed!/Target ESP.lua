@@ -16,37 +16,23 @@
         A: getgenv().FramedTESP_Notifications = false
 
 ]]
+getgenv().FramedTESP_Notifications = true
 local start = tick()
-local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) if not getgenv().FramedTESP_Notifications then return end Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
-if getgenv().Connections then
-	pcall(function()
-		for i,v in ipairs(getgenv().Connections) do
-			v:Disconnect()
-		end
-	end)
-end
-
-if getgenv().ESPList then
-	pcall(function()
-		for i,v in ipairs(getgenv().ESPList) do
-			v:Remove()
-		end
-	end)
-end
-
-getgenv().Connections = {}
-getgenv().ESPList = {}
+if getgenv().Connections then pcall(function() for i,v in ipairs(getgenv().Connections) do v:Disconnect() end end) end; getgenv().Connections = {}
+if getgenv().ESPList then pcall(function() for i,v in ipairs(getgenv().ESPList) do v:Remove() end end) end; getgenv().ESPList = {}
 
 -- // Services \\ --
 local Players = game:GetService("Players")
-local PPS = game:GetService("ProximityPromptService")
+print("All services loaded")
 
 -- // Modules \\ --
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) if not getgenv().FramedTESP_Notifications then return end Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
 
 -- // Variables \\ --
 local Target
 local inGame
+local serverState
 local currentGameMode
 local LPDied
 local PPTriggered
@@ -63,11 +49,11 @@ local SupportedModes = {
 }
 
 -- // Functions \\ --	
-function AddESP(playerName)
+function AddESP(playerName, text, color)
 	ESP.Color = Color3.fromRGB(112, 112, 112)
     local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
-        Name = "Target\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
-        Color = Color3.fromRGB(255, 244, 88),
+        Name = text or "Target\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
+        Color = color or Color3.fromRGB(255, 244, 88),
         Player = false,
         IsEnabled = "FramedTargetESP"
     })
@@ -76,26 +62,42 @@ function AddESP(playerName)
     return TEMP_ESP
 end
 
+local function scanForUndercover()
+	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
+	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for any undercovers.")repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
+	notify("🔎", "Attempting to search for undercover...")
+	local success = false
+	for i,v in ipairs(Players:GetPlayers()) do
+		if v.Backpack:FindFirstChild("Fake Check Target") then
+			AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333))
+			notify("🕵️", "Found undercover: "..v.DisplayName)
+			success = true
+		end
+	end
+	if not success then notify("❌", "Didn't find any undercover!") end
+end
+
 local function scanForNewTarget()
 	notify("🔎", "Attempting to search for target...")
 	pcall(function()
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
 		currentGameMode = workspace.Values.GameMode.Value
+		serverState = workspace.Values.ServerMode.Value
 	end)
 
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot start scan, You are not in-game.") end
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
-	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
+	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target!\n\nPerhaps you can't have a target at this time?", 6.5) end
 
 	AddESP(Target)
 	notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
 
 	TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
-		notify("⚠️", "Target died, Attempting to scan for new target...")
 		TargetDiedTrigger:Disconnect()
+		if currentGameMode == "Contacts" then return end
+		notify("⚠️", "Target died, Attempting to scan for new target...")
 		scanForNewTarget()
 	end)
-
 	table.insert(getgenv().Connections, TargetDiedTrigger)
 end
 
@@ -109,6 +111,7 @@ end
 
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
+	scanForUndercover()
 	pcall(function()
 		for _,v in ipairs() do v:Remove() end
 		LPDied:Disconnect()
@@ -142,18 +145,36 @@ LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
 	end)
 end)
 
-PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
-	if prompt.ActionText == "Get Target" and prompt.ObjectText == "Contact" then
-		scanForNewTarget()
-	end
-end)
 table.insert(getgenv().Connections, LPDied)
-table.insert(getgenv().Connections, PPTriggered)
+
+-- contacts get target event
+if not getgenv().FramedContactsEvent then
+	local mt = getrawmetatable(game)
+	local oldnamecall = mt.__namecall
+	setreadonly(mt, false)
+
+	mt.__namecall = newcclosure(function(self, ...)
+	    local args = {...}
+	    if self == workspace.Events.Prompt and getnamecallmethod() == "FireServer" then
+	        getgenv().Framed_LPTriggeredContact = true
+	    end
+	    return oldnamecall(self, ...)
+	end)
+
+	setreadonly(mt, true)
+	getgenv().FramedContactsEvent = true
+end
 
 -- // Main \\ --
 notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
-
-checkInGameState()
 scanForNewTarget()
 ESP:Toggle(true)
 ESP.Players = false
+
+while task.wait() do
+	if getgenv().Framed_LPTriggeredContact then
+		getgenv().Framed_LPTriggeredContact = false
+		checkInGameState()
+		scanForNewTarget()
+	end
+end
