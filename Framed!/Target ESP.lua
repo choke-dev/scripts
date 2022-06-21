@@ -66,7 +66,7 @@ local function scanForUndercover()
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot scan for undercover, You are not ingame.") end
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
 
-	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover.")repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
+	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover."); repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
@@ -79,7 +79,7 @@ local function scanForUndercover()
 	if not success then notify("❌", "Didn't find an undercover!") end
 end
 
-local function scanForNewTarget()
+function scanForNewTarget()
 	notify("🔎", "Attempting to search for target...")
 	pcall(function()
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
@@ -158,7 +158,7 @@ if not getgenv().FramedContactsEvent then
 	mt.__namecall = newcclosure(function(self, ...)
 	    local args = {...}
 	    if self == workspace.Events.Prompt and getnamecallmethod() == "FireServer" then
-	        getgenv().Framed_LPTriggeredContact = true
+	        scanForNewTarget()
 	    end
 	    return oldnamecall(self, ...)
 	end)
@@ -174,11 +174,3 @@ scanForNewTarget()
 scanForUndercover()
 ESP:Toggle(true)
 ESP.Players = false
-
-while task.wait() do
-	if getgenv().Framed_LPTriggeredContact then
-		getgenv().Framed_LPTriggeredContact = false
-		checkInGameState()
-		scanForNewTarget()
-	end
-end
