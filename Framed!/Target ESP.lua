@@ -67,7 +67,6 @@ local function scanForUndercover()
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
 
 	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover."); repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
-	task.wait(0.35)
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
