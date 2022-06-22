@@ -16,6 +16,7 @@
         A: getgenv().FramedTESP_Notifications = false
 
 ]]
+print("Starting "..script.Name)
 getgenv().FramedTESP_Notifications = true
 local start = tick()
 if getgenv().Connections then pcall(function() for i,v in ipairs(getgenv().Connections) do v:Disconnect() end end) end; getgenv().Connections = {}
@@ -23,7 +24,6 @@ if getgenv().ESPList then pcall(function() for i,v in ipairs(getgenv().ESPList) 
 
 -- // Services \\ --
 local Players = game:GetService("Players")
-print("All services loaded")
 
 -- // Modules \\ --
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
@@ -67,9 +67,11 @@ local function scanForUndercover()
 	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
 
 	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover."); repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
+	task.wait(0.35)
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
+		if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
 		if v.Backpack:FindFirstChild("Fake Check Target") then
 			AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333))
 			notify("🕵️", "Found undercover: "..v.DisplayName)
@@ -88,7 +90,7 @@ function scanForNewTarget()
 	end)
 
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot start scan, You are not in-game.") end
-	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
+	if not SupportedModes[currentGameMode] then return end
 	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target!\n\nPerhaps you can't have a target at this time?", 6.5) end
 
 	AddESP(Target, "Target")
@@ -151,19 +153,26 @@ table.insert(getgenv().Connections, LPDied)
 
 -- contacts get target event
 if not getgenv().FramedContactsEvent then
-	local mt = getrawmetatable(game)
-	local oldnamecall = mt.__namecall
-	setreadonly(mt, false)
+	PPTriggered = Instance.new("BindableEvent")
+	PPTriggered.Name = "ScanForTarget"
+	PPTriggered.Parent = workspace.Events.Prompt
 
-	mt.__namecall = newcclosure(function(self, ...)
-	    local args = {...}
-	    if self == workspace.Events.Prompt and getnamecallmethod() == "FireServer" then
-	        scanForNewTarget()
-	    end
-	    return oldnamecall(self, ...)
+	local old;
+	old = hookmetamethod(game, "__namecall", newcclosure(function(self,...)
+		if getnamecallmethod() == "FireServer" and self.Name == "Prompt" then
+			old(self, ...)
+			self.ScanForTarget:Fire()
+			return
+		end
+
+		return old(self, ...)
+	end))
+
+	workspace.Events.Prompt.ScanForTarget.Event:Connect(function(time)
+		task.wait(time)
+		scanForNewTarget()
 	end)
 
-	setreadonly(mt, true)
 	getgenv().FramedContactsEvent = true
 end
 
