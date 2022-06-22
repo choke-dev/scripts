@@ -16,8 +16,7 @@
         A: getgenv().FramedTESP_Notifications = false
 
 ]]
-print("Starting "..script.Name)
-getgenv().FramedTESP_Notifications = true
+if getgenv().FramedTESP_LOADED then return end
 local start = tick()
 if getgenv().Connections then pcall(function() for i,v in ipairs(getgenv().Connections) do v:Disconnect() end end) end; getgenv().Connections = {}
 if getgenv().ESPList then pcall(function() for i,v in ipairs(getgenv().ESPList) do v:Remove() end end) end; getgenv().ESPList = {}
@@ -151,7 +150,7 @@ end)
 table.insert(getgenv().Connections, LPDied)
 
 -- contacts get target event
-if not getgenv().FramedContactsEvent then
+if getgenv().FramedContactsEvent ~= "true" then
 	PPTriggered = Instance.new("BindableEvent")
 	PPTriggered.Name = "ScanForTarget"
 	PPTriggered.Parent = workspace.Events.Prompt
@@ -172,13 +171,14 @@ if not getgenv().FramedContactsEvent then
 		scanForNewTarget()
 	end)
 
-	getgenv().FramedContactsEvent = true
+	getgenv().FramedContactsEvent = "true"
 end
 
 -- // Main \\ --
-notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
 checkInGameState()
 scanForNewTarget()
 scanForUndercover()
 ESP:Toggle(true)
 ESP.Players = false
+notify("✅", "Script loaded successfully in "..tick() - start.." seconds!")
+getgenv().FramedTESP_LOADED = true
