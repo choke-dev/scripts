@@ -16,7 +16,7 @@
         A: getgenv().FramedTESP_Notifications = false
 
 ]]
-if getgenv().FramedTESP_LOADED then return end
+if getgenv().FramedTESP_LOADED then return warn("Framed Script already loaded!") end
 local start = tick()
 if getgenv().Connections then pcall(function() for i,v in ipairs(getgenv().Connections) do v:Disconnect() end end) end; getgenv().Connections = {}
 if getgenv().ESPList then pcall(function() for i,v in ipairs(getgenv().ESPList) do v:Remove() end end) end; getgenv().ESPList = {}
