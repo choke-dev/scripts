@@ -69,12 +69,15 @@ local function scanForUndercover()
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
+		if v.Team.Name ~= "Framed" then continue end
 		if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
+
 		if v.Backpack:FindFirstChild("Fake Check Target") then
 			AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333))
 			notify("🕵️", "Found undercover: "..v.DisplayName)
 			success = true
 		end
+
 	end
 	if not success then notify("❌", "Didn't find an undercover!") end
 end
