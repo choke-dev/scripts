@@ -26,7 +26,15 @@ local Players = game:GetService("Players")
 
 -- // Modules \\ --
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
-local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) if not getgenv().FramedTESP_Notifications then return end Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; 
+function notify(text, desc, time) 
+	if not getgenv().FramedTESP_Notifications then return end 
+	Notify({ 
+		Description = desc or "Description"; 
+		Title = text or "Title"; 
+		Duration = time or 3 
+	}); 
+end
 
 -- // Variables \\ --
 local Target
@@ -69,7 +77,7 @@ local function scanForUndercover()
 	notify("🔎", "Attempting to search for undercover...")
 	local success = false
 	for i,v in ipairs(Players:GetPlayers()) do
-		if v.Team.Name ~= "Framed" then continue end
+		if v.Team.Name ~= "Framed" and v.Name ~= Players.LocalPlayer.Name then continue end
 		if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
 
 		if v.Backpack:FindFirstChild("Fake Check Target") then
