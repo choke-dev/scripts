@@ -44,16 +44,7 @@ local currentGameMode
 local LPDied
 local PPTriggered
 local TargetDiedTrigger
-local SupportedModes = {
-	["Framed"] = true,
-	["Contacts"] = true,
-	["No Secrets"] = true,
-	["Hunted Man"] = false,
-	["Impostors"] = false,
-	["Elimination"] = false,
-	["Team Elimination"] = false,
-	["Test"] = false
-}
+local SupportedModes = {"Framed","Contacts","No Secrets"}
 
 -- // Functions \\ --	
 function AddESP(playerName, text, color)
@@ -71,7 +62,7 @@ end
 
 local function scanForUndercover()
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot scan for undercover, You are not ingame.") end
-	if not SupportedModes[currentGameMode] then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
+	if not table.find(SupportedModes, currentGameMode) then return notify("❌", "Cannot start scan, Gamemode \""..currentGameMode.."\" is not supported.", 6.5) end
 
 	if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then notify("⌛", "Waiting until game starts before scanning for undercover."); repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
 	notify("🔎", "Attempting to search for undercover...")
