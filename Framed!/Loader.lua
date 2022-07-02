@@ -1,4 +1,4 @@
-getgenv().FramedTESP_Notifications = true
+getgenv().FramedTESP_Notifications = false
 game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
     fireproximityprompt(prompt)
 end)
