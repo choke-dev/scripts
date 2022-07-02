@@ -84,14 +84,13 @@ end
 function scanForNewTarget()
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot start scan, You are not in-game.") end
 	if Players.LocalPlayer.Team.Name ~= "Framed" then return notify("❌", "Cannot start scan, You cannot have a target!") end
-	if not table.find(SupportedModes, tostring(currentGameMode)) then return end
-	notify("🔎", "Attempting to search for target...")
 	pcall(function()
 		Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
 		currentGameMode = workspace.Values.GameMode.Value
 		serverState = workspace.Values.ServerMode.Value
 	end)
-
+	if not table.find(SupportedModes, tostring(currentGameMode)) then return end
+	notify("🔎", "Attempting to search for target...")
 	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target.\n\nPerhaps you can't have a target at this time?", 6.5) end
 
 	AddESP(Target, "Target")
