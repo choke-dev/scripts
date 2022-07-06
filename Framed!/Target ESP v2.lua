@@ -1,107 +1,94 @@
-getgenv().FramedTESP_Notifications = true
-
--- // Modules \\ --
-local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify; local function notify(text, desc, time) if not getgenv().FramedTESP_Notifications then return end Notify({ Description = desc or "Description"; Title = text or "Title"; Duration = time or 3 }); end
-local MODULE_PlayerESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/RE-Script/main/Dependencies/Player%20ESP%20Module.lua"))()
-
--- // Script Updater \\ --
-if getgenv().Connections then
-	pcall(function()
-		for i,v in ipairs(getgenv().Connections) do
-			v:Disconnect()
-		end
-	end)
-	notify("☁️ >>> 💾", "Updating script...")
-end
-getgenv().Connections = {}
-
 -- // Services \\ --
 local Players = game:GetService("Players")
-local PPS = game:GetService("ProximityPromptService")   
+
+-- // Modules \\ --
+local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify;
 
 -- // Variables \\ --
 local Target
+local CurrentGamemode
+local ServerState
 local InGame
-local LPDied
-local LPAdded
-local PlayerAddedEvent
-local PPTriggered
+local ContactTriggered
+local TargetDied
+local TargetESP
+local LocalPlayerDied
+local SupportedModes = {"Framed","Contacts","No Secrets"}
 
--- // Functions \\ --
-local function checkInGameState()
-	if Players.LocalPlayer.Character:WaitForChild("CharacterAttributes", 2) then
-		InGame = true
-	else
-		InGame = false
-	end
+-- // Functions  \\ --
+local function notify(text, desc, time)
+    if not getgenv().FramedTESP_Notifications then return end
+    Notify({
+        Description = desc or "Description";
+        Title = text or "Title";
+        Duration = time or 3
+    });
 end
 
-local function scanForNewTarget()
-	notify("🔎", "Attempting to search for target...")
-	Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
-
-	if not InGame then return notify("❌", "Cannot start scan, You are not in-game.") end
-	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target,\n\nPerhaps you can't have a target at this time?", 6.5) end
-
-	MODULE_PlayerESP.CreateESP(Target, Color3.fromRGB(255, 89, 89), "Target: "..Players[Target].DisplayName.." (@"..Target..")")
-	notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
+local function AddESP(playerName, text, color, istemp)
+    if not istemp then istemp = true end
+	ESP.Color = Color3.fromRGB(112, 112, 112)
+    local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
+        Name = text.."\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
+        Color = color or Color3.fromRGB(255, 141, 88),
+        Player = false,
+        IsEnabled = "FramedTargetESP"
+    })
+	ESP.FramedTargetESP = true
+	if istemp then
+        table.insert(getgenv().ESPList, TEMP_ESP)
+    end
+    return TEMP_ESP
 end
 
--- // Events \\ --
-PlayerAddedEvent = Players.PlayerAdded:Connect(function(player)
-    player.CharacterAdded:Wait()
-    local playerDiedEvent = player.Character:WaitForChild("Humanoid").Died:Connect(function()
-        if player.Name == Target then
-            notify("⚠️", "Target died, Attempting to scan for new target...")
-            MODULE_PlayerESP.RemoveESP(Target)
-            scanForNewTarget()
-        end
-    end)
-    table.insert(getgenv().Connections, playerDiedEvent)
-end)
-
-LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
-    pcall(function()
-        InGame = false
-        notify("❌", "Stopping scan, You died.")
-        MODULE_PlayerESP.RemoveESP(Target)
-    end)
-end)
-
-LPAdded = Players.LocalPlayer.CharacterAdded:Connect(function()
-    pcall(function()
-        MODULE_PlayerESP.RemoveESP(Target)
-        checkInGameState()
-        scanForNewTarget()
-    end)
-end)
-
-PPTriggered = PPS.PromptTriggered:Connect(function(prompt)
-	if prompt.ActionText == "Get Target" and prompt.ObjectText == "Contact" then
-		scanForNewTarget()
-	end
-end)
-
-for _,v in pairs(Players:GetPlayers()) do
-    local initialPlayerDiedEvent = v.Character.Humanoid.Died:Connect(function()
-        if v.Name == Target then
-            notify("⚠️", "Target died, Attempting to scan for new target...")
-            MODULE_PlayerESP.RemoveESP(Target)
-            scanForNewTarget()
-        end
-    end)
-    table.insert(getgenv().Connections, initialPlayerDiedEvent)
+local function scanAllowed()
+    if not InGame or InGame == "nil" then 
+        notify("❌", "Not in-game!")
+        return false
+    end
+	if not table.find(SupportedModes, tostring(CurrentGamemode)) then 
+        notify("❌", "Cannot start scan, Gamemode \""..CurrentGamemode.."\" is not supported.", 6.5)
+        return false
+    end
+    return true
 end
 
-table.insert(getgenv().Connections, LPDied)
-table.insert(getgenv().Connections, LPAdded)
-table.insert(getgenv().Connections, PlayerAddedEvent)
-table.insert(getgenv().Connections, PPTriggered)
-
--- // Main \\ --
-pcall(function()
+local function refreshValues()
     Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
-    MODULE_PlayerESP.RemoveESP(Target)
-end)
-checkInGameState()
-scanForNewTarget()
+	CurrentGamemode = workspace.Values.GameMode.Value
+	ServerState = workspace.Values.ServerMode.Value
+end
+
+local function ScanUndercover()
+    if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then 
+        notify("⌛", "Waiting until game starts before scanning for undercover."); 
+        repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") 
+    end
+        notify("🔎", "Attempting to search for undercover...")
+
+    for i,v in ipairs(Players:GetPlayers()) do
+        if v.Team.Name ~= "Framed" and v.Name ~= Players.LocalPlayer.Name then continue end
+        if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
+
+        if v.Backpack:FindFirstChild("Fake Check Target") then
+            AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333), false)
+            notify("🕵️", "Found undercover: "..v.DisplayName)
+        end
+
+    end
+ end
+
+local function Scan()
+    if not scanAllowed() then return end
+    refreshValues()
+    if not Target or Target == Players.LocalPlayer.Name then return notify("❌", "No target found!") end
+    TargetESP = AddESP(Target, "Target")
+    TargetDied = Players[Target].Character.Humanoid.Died:Connect(function()
+        TargetDied:Disconnect()
+        TargetESP:Remove()
+        if CurrentGamemode == "Contacts" then return end
+        Scan()
+    end)
+    ScanUndercover()
+end
