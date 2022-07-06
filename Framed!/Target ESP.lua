@@ -137,6 +137,10 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 		scanForNewTarget()
 		scanForUndercover()
 	end
+
+	if getgenv().FramedTESP_DisableJumpDebounce then
+		Players.LocalPlayer.Character:WaitForChild("JumpDebouncer").Disabled = true
+	end
 end))
 
 LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()

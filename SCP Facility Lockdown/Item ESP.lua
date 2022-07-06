@@ -31,18 +31,16 @@ end
 
 local function search()
     for _,v in pairs(workspace.Debris:GetChildren()) do
-        if v.Name == "KeyCard" and not CS:HasTag(v, "3D_ESP") then
+        if v.Name == "KeyCard" and not CS:HasTag(v, "2D_ESP") then
             local cardlvl = getLevel(v) or "❌"
-            ESPModule.Create3DESP(v.hand, "Keycard Level: "..cardlvl, Color3.fromRGB(52, 255, 154))
-        elseif isGun(v.Name) and not CS:HasTag(v, "3D_ESP") then
-            ESPModule.Create3DESP(v.hand, v.Name, Color3.fromRGB(255, 106, 37))
-        elseif isItem(v.Name) and not CS:HasTag(v, "3D_ESP") then
-            ESPModule.Create3DESP(v.hand, v.Name, Color3.fromRGB(171, 98, 255))
+            ESPModule.Create2DESP(v.hand, "Keycard Level: "..cardlvl, Color3.fromRGB(52, 255, 154))
+        elseif isGun(v.Name) and not CS:HasTag(v, "2D_ESP") then
+            ESPModule.Create2DESP(v.hand, v.Name, Color3.fromRGB(255, 106, 37))
+        elseif isItem(v.Name) and not CS:HasTag(v, "2D_ESP") then
+            ESPModule.Create2DESP(v.hand, v.Name, Color3.fromRGB(171, 98, 255))
         end
     end
 end
-
-search()
 
 workspace.Debris.ChildAdded:Connect(function()
     search()
@@ -50,6 +48,8 @@ end)
 
 workspace.Debris.ChildRemoved:Connect(function(instance)
     pcall(function()
-        CS:RemoveTag(instance.hand, "3D_ESP")
+        CS:RemoveTag(instance.hand, "2D_ESP")
     end)
 end)
+
+search()
