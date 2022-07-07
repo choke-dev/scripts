@@ -1,4 +1,5 @@
 getgenv().FramedTESP_Notifications = false
+getgenv().FramedTESP_DisableJumpDebounce = true
 game:GetService("ProximityPromptService").PromptButtonHoldBegan:Connect(function(prompt)
     fireproximityprompt(prompt)
 end)
