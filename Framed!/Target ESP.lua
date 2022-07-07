@@ -184,31 +184,35 @@ end
 
 Players.PlayerAdded:Connect(function(player)
 	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
-		if player.RedHanded.Value then
-			getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
-		elseif Target == player.Name then
-			getgenv().RedHandedESP[player.Name]:Remove()
-			getgenv().RedHandedESP[player.Name] = nil
-			AddESP(Target, "Target")
-		else
-			getgenv().RedHandedESP[player.Name]:Remove()
-			getgenv().RedHandedESP[player.Name] = nil
-		end
+		pcall(function()
+			if player.RedHanded.Value then
+				getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
+			elseif Target == player.Name and inGame then
+				getgenv().RedHandedESP[player.Name]:Remove()
+				getgenv().RedHandedESP[player.Name] = nil
+				AddESP(Target, "Target")
+			else
+				getgenv().RedHandedESP[player.Name]:Remove()
+				getgenv().RedHandedESP[player.Name] = nil
+			end
+		end)
 	end)
 end)
 
 for _,player in pairs(Players:GetPlayers()) do
 	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
-		if player.RedHanded.Value then
-			getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
-		elseif Target == player.Name then
-			getgenv().RedHandedESP[player.Name]:Remove()
-			getgenv().RedHandedESP[player.Name] = nil
-			AddESP(Target, "Target")
-		else
-			getgenv().RedHandedESP[player.Name]:Remove()
-			getgenv().RedHandedESP[player.Name] = nil
-		end
+		pcall(function()
+			if player.RedHanded.Value then
+				getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
+			elseif Target == player.Name and inGame then
+				getgenv().RedHandedESP[player.Name]:Remove()
+				getgenv().RedHandedESP[player.Name] = nil
+				AddESP(Target, "Target")
+			else
+				getgenv().RedHandedESP[player.Name]:Remove()
+				getgenv().RedHandedESP[player.Name] = nil
+			end
+		end)
 	end)
 end
 
