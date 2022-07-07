@@ -20,6 +20,7 @@ if getgenv().FramedTESP_LOADED then return warn("Framed Script already loaded!")
 local start = tick()
 if getgenv().Connections then pcall(function() for i,v in ipairs(getgenv().Connections) do v:Disconnect() end end) end; getgenv().Connections = {}
 if getgenv().ESPList then pcall(function() for i,v in ipairs(getgenv().ESPList) do v:Remove() end end) end; getgenv().ESPList = {}
+getgenv().RedHandedESP = {}
 
 -- // Services \\ --
 local Players = game:GetService("Players")
@@ -45,6 +46,7 @@ local LPDied
 local PPTriggered
 local TargetDiedTrigger
 local SupportedModes = {"Framed","Contacts","No Secrets"}
+local Weapons = {"Luger","M1911","Hand Cannon","MAC10","Six Shooter","Mauser", "MP5","Bowie Knife","Spas-12","Dragunov"}
 
 -- // Functions \\ --	
 function AddESP(playerName, text, color)
@@ -53,9 +55,9 @@ function AddESP(playerName, text, color)
         Name = text.."\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
         Color = color or Color3.fromRGB(255, 244, 88),
         Player = false,
-        IsEnabled = "FramedTargetESP"
+        IsEnabled = playerName
     })
-	ESP.FramedTargetESP = true
+	ESP[playerName] = true
 	table.insert(getgenv().ESPList, TEMP_ESP)
     return TEMP_ESP
 end
@@ -178,6 +180,36 @@ if getgenv().FramedContactsEvent ~= "true" then
 	end)
 
 	getgenv().FramedContactsEvent = "true"
+end
+
+Players.PlayerAdded:Connect(function(player)
+	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
+		if player.RedHanded.Value then
+			getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
+		elseif Target == player.Name then
+			getgenv().RedHandedESP[player.Name]:Remove()
+			getgenv().RedHandedESP[player.Name] = nil
+			AddESP(Target, "Target")
+		else
+			getgenv().RedHandedESP[player.Name]:Remove()
+			getgenv().RedHandedESP[player.Name] = nil
+		end
+	end)
+end)
+
+for _,player in pairs(Players:GetPlayers()) do
+	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
+		if player.RedHanded.Value then
+			getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
+		elseif Target == player.Name then
+			getgenv().RedHandedESP[player.Name]:Remove()
+			getgenv().RedHandedESP[player.Name] = nil
+			AddESP(Target, "Target")
+		else
+			getgenv().RedHandedESP[player.Name]:Remove()
+			getgenv().RedHandedESP[player.Name] = nil
+		end
+	end)
 end
 
 -- // Main \\ --
