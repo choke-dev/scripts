@@ -38,6 +38,7 @@ function notify(text, desc, time)
 end
 
 -- // Variables \\ --
+local ManualScanESP
 local Target
 local inGame
 local serverState
@@ -49,7 +50,8 @@ local SupportedModes = {"Framed","Contacts","No Secrets"}
 local Weapons = {"Luger","M1911","Hand Cannon","MAC10","Six Shooter","Mauser", "MP5","Bowie Knife","Spas-12","Dragunov"}
 
 -- // Functions \\ --	
-function AddESP(playerName, text, color)
+function AddESP(playerName, text, color, istemp)
+	if istemp == nil then istemp = true end
 	ESP.Color = Color3.fromRGB(112, 112, 112)
     local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
         Name = text.."\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
@@ -58,7 +60,9 @@ function AddESP(playerName, text, color)
         IsEnabled = playerName
     })
 	ESP[playerName] = true
-	table.insert(getgenv().ESPList, TEMP_ESP)
+	if istemp then
+		table.insert(getgenv().ESPList, TEMP_ESP)
+	end
     return TEMP_ESP
 end
 
@@ -74,7 +78,7 @@ local function scanForUndercover()
 		if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
 
 		if v.Backpack:FindFirstChild("Fake Check Target") then
-			AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333))
+			AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333), false)
 			notify("🕵️", "Found undercover: "..v.DisplayName)
 			success = true
 		end
@@ -114,6 +118,7 @@ local function checkInGameState()
 		inGame = false
 	end
 end
+
 
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
@@ -208,7 +213,15 @@ for _,player in pairs(Players:GetPlayers()) do
 	end)
 end
 
--- // Main \\ --
+-- // Keybind \\ --
+game:GetService("ContextActionService"):BindAction("Framed_ScanForTarget", function()
+	pcall(function()
+		ManualScanESP:Remove() -- couldnt be bothered making a check
+	end)
+	ManualScanESP = scanForNewTarget()
+end, false, Enum.KeyCode.Q)
+
+-- // Main \\ --	
 checkInGameState()
 scanForNewTarget()
 scanForUndercover()
