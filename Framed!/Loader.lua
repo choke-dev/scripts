@@ -12,4 +12,4 @@ Copy the code below to quickly run this loader.
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Framed!/Loader.lua"))()
 
-]]
+]]  
