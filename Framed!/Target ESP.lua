@@ -88,6 +88,7 @@ local function scanForUndercover()
 end
 
 function scanForNewTarget()
+	local temp_returnfunction
 	if not inGame or inGame == "nil" then return notify("❌", "Cannot start scan, You are not in-game.") end
 	if Players.LocalPlayer.Team.Name ~= "Framed" then return notify("❌", "Cannot start scan, You cannot have a target!") end
 	pcall(function()
@@ -99,7 +100,7 @@ function scanForNewTarget()
 	notify("🔎", "Attempting to search for target...")
 	if Target == "nil" or Target == Players.LocalPlayer.Name then return notify("❌", "Didn't find a target.\n\nPerhaps you can't have a target at this time?", 6.5) end
 
-	AddESP(Target, "Target")
+	temp_returnfunction = AddESP(Target, "Target")
 	notify("🎯", "Found target: "..Players[tostring(Target)].DisplayName)
 
 	TargetDiedTrigger = Players[tostring(Target)].Character.Humanoid.Died:Connect(function()
@@ -109,6 +110,7 @@ function scanForNewTarget()
 		scanForNewTarget()
 	end)
 	table.insert(getgenv().Connections, TargetDiedTrigger)
+	return temp_returnfunction
 end
 
 local function checkInGameState()
@@ -123,7 +125,8 @@ end
 -- // Events \\ --
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
-		for _,v in ipairs() do v:Remove() end
+		for _,v in pairs(ESPList) do v:Remove() end
+		task.spawn(function() for _,v in pairs(Players:GetPlayers()) do getgenv().RedHandedESP[v.Name]:Remove() getgenv().RedHandedESP[v.Name] = nil end end)
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
 	end)
@@ -189,7 +192,8 @@ end
 
 Players.PlayerAdded:Connect(function(player)
 	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
-		pcall(function()
+		task.wait()
+		local success, err = pcall(function()
 			if player.RedHanded.Value and inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") then
 				getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
 			elseif inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") then
@@ -197,6 +201,7 @@ Players.PlayerAdded:Connect(function(player)
 				getgenv().RedHandedESP[player.Name] = nil
 			end
 		end)
+		if not success then warn("An Error Occured while trying to configure Red-Handed ESP on a player:\n\n"..err) end
 	end)
 end)
 
@@ -213,7 +218,7 @@ for _,player in pairs(Players:GetPlayers()) do
 	end)
 end
 
--- // Keybind \\ --
+-- // manual scan for hunted man \\ --
 game:GetService("ContextActionService"):BindAction("Framed_ScanForTarget", function()
 	pcall(function()
 		ManualScanESP:Remove() -- couldnt be bothered making a check
