@@ -23,6 +23,15 @@ getgenv().MAX_BLOCK_CHANGED = 80 -- how many !warp, !cannon commands have to be 
 
 -- // Services \\ --
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+
+-- // Setup \\ --
+if not isfolder("./BlockateAntiGrief") then
+    makefolder("./BlockateAntiGrief")
+end
+if not isfile("./BlockateAntiGrief/GrieferList.json") then
+    writefile("./BlockateAntiGrief/GrieferList.json", "{}")
+end
 
 -- // Functions \\ --
 local function shout(message)
@@ -53,6 +62,7 @@ end
 
 local playerDestroyCount = {}
 local playerPaintCount = {}
+local grieferList = HttpService:JSONDecode(readfile("./BlockateAntiGrief/GrieferList.json"))
 
 -- // Events \\ --
 Players.LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Logs").Visible = true -- opens the logs gui so the event below wont freak out and hub/ban randoms
@@ -93,6 +103,7 @@ while task.wait(2) do
             if v >= getgenv().MAX_BLOCK_DELETE then
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Griefer (Mass Block Deletion)")
+                grieferList[k]
                 playerDestroyCount[k] = nil
                 playerPaintCount[k] = nil
                 continue
