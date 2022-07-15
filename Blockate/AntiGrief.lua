@@ -55,7 +55,9 @@ local playerDestroyCount = {}
 local playerPaintCount = {}
 
 -- // Events \\ --
-Players.LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Logs"):WaitForChild("LogsList").ChildAdded:Connect(function(child)
+Players.LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Logs").Visible = true -- opens the logs gui so the event below wont freak out and hub/ban randoms
+
+Players.LocalPlayer.PlayerGui.MainGUI.Logs.LogsList.ChildAdded:Connect(function(child)
     if string.find(child.Text, "destroyed") then
         local Args = child.Text:split(" ")
         local player = Args[1]
