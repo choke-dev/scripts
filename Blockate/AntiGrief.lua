@@ -89,6 +89,7 @@ while task.wait(2) do
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Block Griefer")
                 playerDestroyCount[k] = nil
+                return
             end
             playerDestroyCount[k] = 0
         end
@@ -101,6 +102,7 @@ while task.wait(2) do
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Paint Griefer")
                 playerPaintCount[k] = nil
+                return
             end
             playerPaintCount[k] = 0
         end
