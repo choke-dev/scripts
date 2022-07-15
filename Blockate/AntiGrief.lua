@@ -19,6 +19,7 @@
 -- // Configuration \\ --
 getgenv().MAX_BLOCK_DELETE = 80 -- how many blocks have to be deleted per 2 seconds for the check to trigger
 getgenv().MAX_BLOCK_PAINT = 490 -- how many blocks have to be painted per 2 seconds for the check to trigger
+getgenv().MAX_BLOCK_CHANGED = 80 -- how many !warp, !cannon commands have to be run per 2 seconds on a block for the check to trigger
 
 -- // Services \\ --
 local Players = game:GetService("Players")
@@ -64,7 +65,6 @@ Players.LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Logs"):WaitF
         local Args = child.Text:split(" ")
         local player = Args[1]
         local paintedBlocks = Args[3] == "a" and 1 or Args[3]
-        print(player, paintedBlocks)
         playerPaintCount[player] = playerPaintCount[player] + paintedBlocks
         print("Block painted by "..player..", their paint count per two seconds is currently: "..playerPaintCount[player])
     end
@@ -80,13 +80,13 @@ for _,v in pairs(Players:GetPlayers()) do
     playerPaintCount[v.Name] = 0
 end
 
-shout("\n\n\n\n\n\n\n\n✅ Blockate Anti-Grief Initialized.")
+shout("\n\n\n\n\n\n\n\n✅ Blockate Anti-Grief Initialized.\nmade by not nooby_boop")
 
 while task.wait(2) do
     -- // Block Destroy \\ --
     task.spawn(function()
         for k,v in pairs(playerDestroyCount) do
-            print("Destroy Count", k,v)
+            print("Destroy Count", k,v, "\n")
             if v >= getgenv().MAX_BLOCK_DELETE then
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Griefer (Mass Block Deletion)")
@@ -100,7 +100,7 @@ while task.wait(2) do
     -- // Block Paint \\ --
     task.spawn(function()
         for k,v in pairs(playerPaintCount) do
-            print("Paint Count", k,v)
+            print("Paint Count", k,v, "\n")
             if v >= getgenv().MAX_BLOCK_PAINT then
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Griefer (Mass Block Painting)")
