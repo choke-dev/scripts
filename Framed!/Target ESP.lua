@@ -198,6 +198,7 @@ Players.PlayerAdded:Connect(function(player)
 				getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
 			elseif inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") then
 				getgenv().RedHandedESP[player.Name]:Remove()
+				task.wait()
 				getgenv().RedHandedESP[player.Name] = nil
 			end
 		end)
