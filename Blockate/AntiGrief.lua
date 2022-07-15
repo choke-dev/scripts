@@ -54,6 +54,7 @@ end
 local playerDestroyCount = {}
 local playerPaintCount = {}
 
+-- // Events \\ --
 Players.LocalPlayer.PlayerGui:WaitForChild("MainGUI"):WaitForChild("Logs"):WaitForChild("LogsList").ChildAdded:Connect(function(child)
     if string.find(child.Text, "destroyed") then
         local Args = child.Text:split(" ")
@@ -80,7 +81,7 @@ for _,v in pairs(Players:GetPlayers()) do
     playerPaintCount[v.Name] = 0
 end
 
-shout("\n\n\n\n\n\n\n\n✅ Blockate Anti-Grief Initialized.\nmade by not nooby_boop")
+shout("\n\n\n\n\n\n\n\n✅ Blockate Anti-Grief Initialized.")
 
 while task.wait(2) do
     -- // Block Destroy \\ --
