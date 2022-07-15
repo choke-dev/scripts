@@ -89,7 +89,7 @@ while task.wait(2) do
             print("Destroy Count", k,v)
             if v >= getgenv().MAX_BLOCK_DELETE then
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
-                hub(k, "Potential Block Griefer")
+                hub(k, "Potential Griefer (Mass Block Deletion)")
                 playerDestroyCount[k] = nil
                 playerPaintCount[k] = nil
                 continue
@@ -103,7 +103,7 @@ while task.wait(2) do
             print("Paint Count", k,v)
             if v >= getgenv().MAX_BLOCK_PAINT then
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
-                hub(k, "Potential Paint Griefer")
+                hub(k, "Potential Griefer (Mass Block Painting)")
                 playerPaintCount[k] = nil
                 playerDestroyCount[k] = nil
                 continue
