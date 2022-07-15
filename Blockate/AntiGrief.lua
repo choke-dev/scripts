@@ -1,17 +1,19 @@
 --[[
 
-  Blockate Anti-Grief
+    Blockate Anti-Grief
 
-  This Script Prevents These Types of Griefing:
-  ✅ Block Deletion
-  ✅ Paint Griefing
+    This Script Prevents These Types of Griefing:
 
-  HOW TO USE:
-  1. Run !logs
-  2. Run script
-  3. Enjoy
+    ✅ Block Deletion
+    ✅ Paint Griefing
+    TBA: Command-based griefing (!warp, !kill, !cannon, etc.)
 
-  made with a 🔥 passion and 💖
+    HOW TO USE:
+    1. Run !logs
+    2. Run script
+    3. Enjoy
+
+    made with a 🔥 passion and 💖
 ]]
 
 -- // Configuration \\ --
@@ -89,7 +91,8 @@ while task.wait(2) do
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Block Griefer")
                 playerDestroyCount[k] = nil
-                return
+                playerPaintCount[k] = nil
+                continue
             end
             playerDestroyCount[k] = 0
         end
@@ -102,7 +105,8 @@ while task.wait(2) do
                 shout("\n\n\n\n\n\n\n\n⚠️ Hubbing Potential Griefer: "..k)
                 hub(k, "Potential Paint Griefer")
                 playerPaintCount[k] = nil
-                return
+                playerDestroyCount[k] = nil
+                continue
             end
             playerPaintCount[k] = 0
         end
