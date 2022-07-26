@@ -221,9 +221,9 @@ end
 
 -- // manual scan for hunted man \\ --
 game:GetService("ContextActionService"):BindAction("Framed_ScanForTarget", function()
-	pcall(function()
-		ManualScanESP:Remove() -- couldnt be bothered making a check
-	end)
+	if ManualScanESP then
+		ManualScanESP:Remove()
+	end
 	ManualScanESP = scanForNewTarget()
 end, false, Enum.KeyCode.Q)
 
