@@ -17,7 +17,7 @@ local function getRandomPlayer()
 end
 
 local function countdown(startingNum, text, eventType)
-    for i = startingNum, 0, -1 do
+    for i = startingNum, 0, -0.1 do
         shout(([[
         %s
 
@@ -28,7 +28,7 @@ local function countdown(startingNum, text, eventType)
 
         %s
         ]]):format(i,text))
-        task.wait(0.5)
+        task.wait(0.125)
     end
     shout("")
 
