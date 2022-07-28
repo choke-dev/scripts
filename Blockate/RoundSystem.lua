@@ -16,11 +16,11 @@ local function shout(message)
 end
 
 --[[ Setup ]]--
-local count = 0
+local eventCount = 0
 local playerCount = 0
 local eventStrings = {}
 for _,v in pairs(Events) do
- count += 1
+ eventCount += 1
 end
 Players.PlayerAdded:Connect(function()
     playerCount += 1
@@ -39,7 +39,7 @@ end
 task.spawn(function()
     while true do
         task.wait()
-        if playerCount > 0 then
+        if playerCount > 1 then
             getgenv().BRS_Settings.PAUSED = false
         else
             getgenv().BRS_Settings.PAUSED = true
@@ -48,7 +48,16 @@ task.spawn(function()
 end)
 
 while true do
-    if getgenv().BRS_Settings.PAUSED then repeat task.wait(1); shout("⏳| Waiting for players...") until not getgenv().BRS_Settings.PAUSED end
+    if getgenv().BRS_Settings.PAUSED then repeat task.wait(1); shout([[
+        ⏳
+
+
+
+
+
+
+        Round paused. Waiting for players...
+        ]]) until not getgenv().BRS_Settings.PAUSED end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
-    Events[eventStrings[math.random(1, count)]]()
+    Events[eventStrings[math.random(1, eventCount)]]()
 end

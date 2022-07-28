@@ -2,6 +2,11 @@
 local Players = game:GetService("Players")
 
 --[[ Functions ]]--
+local function round(number, decimalPlaces)
+    local decplaces = decimalPlaces or 0
+	return math.round(number * 10^decplaces) * 10^-decplaces
+end
+
 local function runCommand(text)
     game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
 end
@@ -27,7 +32,7 @@ local function countdown(startingNum, text, eventType)
 
 
         %s
-        ]]):format(i,text))
+        ]]):format(round(i, 1),text))
         task.wait(0.125)
     end
     shout("")
