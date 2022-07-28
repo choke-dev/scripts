@@ -29,7 +29,7 @@ end
 --[[ Main ]]--
 
 while true do
-    if getgenv().BRS_Settings.PAUSED then repeat task.wait() until not getgenv().BRS_Settings.PAUSEDend
+    if getgenv().BRS_Settings.PAUSED then repeat task.wait() until not getgenv().BRS_Settings.PAUSED end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
     Events[math.random(1, count)]()
 end
