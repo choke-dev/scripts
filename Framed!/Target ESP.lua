@@ -15,6 +15,8 @@
 	Q: How do i turn off notifications?
         A: getgenv().FramedTESP_Notifications = false
 
+	(note for anyone copy-pasting this on script sites, please inform me first before posting.)
+
 ]]
 if getgenv().FramedTESP_LOADED then return warn("Framed Script already loaded!") end
 local start = tick()
