@@ -51,7 +51,7 @@ return {
             shout("New world gravity: "..math.random(5, 500))
             task.wait(0.2)
         end
-        shout("New world gravity: "..gravity
+        shout("New world gravity: "..gravity)
     end,
     ["RANDOM_PLAYER_GETS_SWORD"] = function()
         local target = countdown(5, "A random player will get a sword.", 1)
