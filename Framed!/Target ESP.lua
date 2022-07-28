@@ -24,6 +24,7 @@ getgenv().RedHandedESP = {}
 
 -- // Services \\ --
 local Players = game:GetService("Players")
+local CollectionService = game:GetService("CollectionService")
 
 -- // Modules \\ --
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
@@ -194,9 +195,11 @@ Players.PlayerAdded:Connect(function(player)
 	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
 		task.wait()
 		local success, err = pcall(function()
-			if player.RedHanded.Value and inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") then
+			if player.RedHanded.Value and inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") and not CollectionService:HasTag(player.Character, "RedHanded") then
+				CollectionService:AddTag(player.Character, "RedHanded")
 				getgenv().RedHandedESP[player.Name] = AddESP(player.Name, "Red-Handed", Color3.new(1, 0, 0))
-			elseif inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") then
+			elseif inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") and CollectionService:HasTag(player.Character, "RedHanded") then
+				CollectionService:RemoveTag(player.Character, "RedHanded")
 				getgenv().RedHandedESP[player.Name]:Remove()
 				task.wait()
 				getgenv().RedHandedESP[player.Name] = nil
@@ -225,7 +228,7 @@ game:GetService("ContextActionService"):BindAction("Framed_ScanForTarget", funct
 		ManualScanESP:Remove()
 	end
 	ManualScanESP = scanForNewTarget()
-end, false, Enum.KeyCode.Q)
+end, false, Enum.KeyCode.X)
 
 -- // Main \\ --	
 checkInGameState()
