@@ -1,6 +1,7 @@
 --[[ Configuration ]]--
-getgenv().BlockateRoundSystem_Settings = {
-
+getgenv().BRS_Settings = {
+TIME_UNTIL_NEXT_EVENT = 4.5,
+PAUSED = true
 }
 
 --[[ Services ]]--
@@ -9,44 +10,26 @@ local Players = game:GetService("Players")
 --[[ Modules ]]--
 local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
 
---[[ Functions ]]--
-local function runCommand(text)
-    game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
+--[[ Setup ]]--
+local count = 0
+local playerCount = 0
+for _,v in pairs(Events) do
+ count += 1
+end
+Players.PlayerAdded:Connect(function()
+    count += 1
+end)
+Players.PlayerRemoving:Connect(function()
+    count -= 1
+end)
+for _,v in pairs(Players:GetPlayers()) do
+    count += 1
 end
 
-local function shout(message)
-    game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
+--[[ Main ]]--
+
+while true do
+    if getgenv().BRS_Settings.PAUSED then repeat task.wait() until not getgenv().BRS_Settings.PAUSEDend
+    task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
+    Events[math.random(1, count)]()
 end
-
-local function getRandomPlayer()
-    local players = Players:GetPlayers()
-    local randomPlayer = players[math.random(1, #players)]
-    return randomPlayer
-end
-
-local function countdown(startingNum, text, eventType)
-    for i = startingNum, 0, -1 do
-        shout(([[
-        %s
-
-
-
-
-
-
-        %s
-        ]]):format(i,text))
-        task.wait(0.5)
-    end
-    shout("")
-
-    if eventType == 1 then
-        return getRandomPlayer(), text
-    elseif eventType == 2 then
-        return math.random(5, 500), text
-    end
-end
-
-local plr, runEvent = countdown(5, Events[math.random(1, #Events)], 1)
-shout("💀 "..plr.Name.." was killed.")
-runCommand(Events[runEvent]:format(plr.Name))
