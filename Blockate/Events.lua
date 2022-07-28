@@ -33,7 +33,7 @@ local function countdown(startingNum, text, eventType)
 
         %s
         ]]):format(round(i, 1),text))
-        task.wait(0.125)
+        task.wait()
     end
     shout("")
 
