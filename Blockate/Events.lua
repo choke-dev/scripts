@@ -40,28 +40,26 @@ local function countdown(startingNum, text, eventType)
     if eventType == 1 then
         return getRandomPlayer(), text
     elseif eventType == 2 then
-        return math.random(5, 500), text
+        return math.random(5, 200), text
     end
 end
 
 return {
     ["RANDOM_PLAYER_KILLED"] = function()
         local target = countdown(5, "A random player will die.", 1)
-        shout("💀| "..target.Name.." was killed.")
         runCommand("!kill "..target.Name)
     end,
     ["MODIFY_GRAVITY"] = function()
-        local gravity = countdown(5, "World gravity will change.", 2)
+        local gravity = countdown(5, "The world gravity is changing!", 2)
         for i = 1, 6 do
-            shout("Choosing new world gravity: "..math.random(5, 500))
-            task.wait(0.1)
+            shout("Choosing new world gravity: "..math.random(5, 200))
+            task.wait(0.3)
         end
         shout("New world gravity: "..gravity)
         runCommand("!gravity "..gravity)
     end,
     ["RANDOM_PLAYER_GETS_SWORD"] = function()
         local target = countdown(5, "A random player will get a sword.", 1)
-        shout("🗡| "..target.Name.." recieved a sword!")
         runCommand("!gear "..target.Name.." sword")
     end
 }

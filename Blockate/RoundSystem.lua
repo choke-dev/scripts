@@ -8,7 +8,7 @@ PAUSED = true
 local Players = game:GetService("Players")
 
 --[[ Modules ]]--
-local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
+local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/614dbed678aa860e95f172b1e3eee777bc6df6ed/Blockate/Events.lua",true))()
 
 --[[ Functions ]]--
 local function shout(message)
