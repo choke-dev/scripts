@@ -45,7 +45,16 @@ return {
         shout("💀| "..target.Name.." was killed.")
         runCommand(("!kill %s"):format(target.Name)) 
     end,
-    ["DECREASE_GRAVITY"] = function()
-        
+    ["MODIFY_GRAVITY"] = function()
+        local gravity = countdown(5, "World gravity will change.", 2)
+        for i = 1, 6 do
+            shout("New world gravity: "..math.random(5, 500))
+            task.wait(0.2)
+        end
+        shout("New world gravity: "..gravity
+    end,
+    ["RANDOM_PLAYER_GETS_SWORD"] = function()
+        local target = countdown(5, "A random player will get a sword.", 1)
+        shout("🗡| "..target.Name.." recieved a sword!")
     end
 }
