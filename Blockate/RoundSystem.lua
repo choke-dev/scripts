@@ -23,13 +23,13 @@ for _,v in pairs(Events) do
  count += 1
 end
 Players.PlayerAdded:Connect(function()
-    count += 1
+    playerCount += 1
 end)
 Players.PlayerRemoving:Connect(function()
-    count -= 1
+    playerCount -= 1
 end)
 for _,v in pairs(Players:GetPlayers()) do
-    count += 1
+    playerCount += 1
 end
 for i,_ in pairs(Events) do
     table.insert(eventStrings, i)
