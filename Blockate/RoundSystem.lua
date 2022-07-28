@@ -1,5 +1,13 @@
+--[[ Configuration ]]--
+getgenv().BlockateRoundSystem_Settings = {
+
+}
+
 --[[ Services ]]--
 local Players = game:GetService("Players")
+
+--[[ Modules ]]--
+local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
 
 --[[ Functions ]]--
 local function runCommand(text)
@@ -39,13 +47,6 @@ local function countdown(startingNum, text, eventType)
     end
 end
 
-return {
-    ["RANDOM_PLAYER_KILLED"] = function()
-        local target = countdown(5, "A random player will die.", 1)
-        shout("💀| "..target.Name.." was killed.")
-        runCommand(("!kill %s"):format(target.Name)) 
-    end,
-    ["DECREASE_GRAVITY"] = function()
-        
-    end
-}
+local plr, runEvent = countdown(5, Events[math.random(1, #Events)], 1)
+shout("💀 "..plr.Name.." was killed.")
+runCommand(Events[runEvent]:format(plr.Name))
