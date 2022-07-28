@@ -39,7 +39,7 @@ end
 task.spawn(function()
     while true do
         task.wait()
-        if count > 0 then
+        if playerCount > 0 then
             getgenv().BRS_Settings.PAUSED = false
         else
             getgenv().BRS_Settings.PAUSED = true
@@ -48,7 +48,7 @@ task.spawn(function()
 end)
 
 while true do
-    if getgenv().BRS_Settings.PAUSED then repeat task.wait(1); shout("Waiting for players...") until not getgenv().BRS_Settings.PAUSED end
+    if getgenv().BRS_Settings.PAUSED then repeat task.wait(1); shout("⏳| Waiting for players...") until not getgenv().BRS_Settings.PAUSED end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
     Events[eventStrings[math.random(1, count)]]()
 end
