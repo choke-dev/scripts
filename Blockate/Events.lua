@@ -64,6 +64,8 @@ local function countdown(startingNum, text, eventType)
     end
 end
 
+--[[ Main Events ]]--
+
 return {
     --[[ Player Events ]]--
     ["RANDOM_PLAYER_KILLED"] = function()
@@ -87,6 +89,7 @@ return {
         runCommand("!ball "..target.Name)
     end,
     ["RANDOM_PLAYER_HUBBED"] = function()
+        if #Players < 10 then return end
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
     end,
