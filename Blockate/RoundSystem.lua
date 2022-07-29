@@ -1,11 +1,11 @@
 --[[ Configuration ]]--
 getgenv().BRS_Settings = {
     TIME_UNTIL_NEXT_EVENT = 4.5,
+    COUNTDOWN = 5,
     BLACKLISTED_PLAYERS = {
 
     }
 }
-
 --[[ Services ]]--
 local Players = game:GetService("Players")
 
