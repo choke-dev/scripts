@@ -132,7 +132,9 @@ return {
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
-        local HRPos = target.Character.HumanoidRootPart.Position
+        local Temp_HRPos = target.Character.HumanoidRootPart.Position
+        local HRPos = Temp_HRPos
+        Temp_HRPos = nil
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         place(HRPos, randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
@@ -146,7 +148,9 @@ return {
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A large plate will be placed on a random player.", 1)
-        local HRPos = target.Character.HumanoidRootPart.Position
+        local Temp_HRPos = target.Character.HumanoidRootPart.Position
+        local HRPos = Temp_HRPos
+        Temp_HRPos = nil
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         place(HRPos, randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
