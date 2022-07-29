@@ -17,7 +17,9 @@ local PAUSED = true
 
 --[[ Functions ]]--
 local function shout(message)
-    game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
+    pcall(function()
+        game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
+    end)
 end
 
 --[[ Setup ]]--
