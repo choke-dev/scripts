@@ -2,7 +2,7 @@
 getgenv().BRS_Settings = {
     TIME_UNTIL_NEXT_EVENT = 4.5,
     BLACKLISTED_PLAYERS = {
-        
+
     }
 }
 
@@ -10,7 +10,7 @@ getgenv().BRS_Settings = {
 local Players = game:GetService("Players")
 
 --[[ Modules ]]--
-local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/614dbed678aa860e95f172b1e3eee777bc6df6ed/Blockate/Events.lua",true))()
+local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
 
 --[[ Variables ]]--
 local PAUSED = true
