@@ -98,7 +98,7 @@ return {
         local gravity = countdown(getgenv().BRS_Settings.COUNTDOWN, "The world gravity is changing!", 2)
         for i = 1, 6 do
             shout("Choosing new world gravity: "..math.random(5, 200))
-            task.wait(0.3)
+            task.wait(0.5)
         end
         shout("New world gravity: "..gravity)
         runCommand("!gravity "..gravity)
