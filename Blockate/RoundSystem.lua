@@ -1,7 +1,9 @@
 --[[ Configuration ]]--
 getgenv().BRS_Settings = {
-TIME_UNTIL_NEXT_EVENT = 4.5,
-PAUSED = true
+    TIME_UNTIL_NEXT_EVENT = 4.5,
+    BLACKLISTED_PLAYERS = {
+        
+    }
 }
 
 --[[ Services ]]--
@@ -9,6 +11,9 @@ local Players = game:GetService("Players")
 
 --[[ Modules ]]--
 local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/614dbed678aa860e95f172b1e3eee777bc6df6ed/Blockate/Events.lua",true))()
+
+--[[ Variables ]]--
+local PAUSED = true
 
 --[[ Functions ]]--
 local function shout(message)
@@ -40,15 +45,15 @@ task.spawn(function()
     while true do
         task.wait()
         if playerCount > 1 then
-            getgenv().BRS_Settings.PAUSED = false
+            PAUSED = false
         else
-            getgenv().BRS_Settings.PAUSED = true
+            PAUSED = true
         end
     end
 end)
 
 while true do
-    if getgenv().BRS_Settings.PAUSED then repeat task.wait(1); shout([[
+    if PAUSED then repeat task.wait(1); shout([[
         ⏳
 
 
@@ -57,7 +62,7 @@ while true do
 
 
         Round paused. Waiting for players...
-        ]]) until not getgenv().BRS_Settings.PAUSED end
+        ]]) until not PAUSED end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
     Events[eventStrings[math.random(1, eventCount)]]()
 end
