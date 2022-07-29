@@ -129,7 +129,7 @@ end
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
 		for _,v in pairs(ESPList) do v:Remove() end
-		task.spawn(function() for _,v in pairs(Players:GetPlayers()) do getgenv().RedHandedESP[v.Name]:Remove() getgenv().RedHandedESP[v.Name] = nil end end)
+		--task.spawn(function() for _,v in pairs(Players:GetPlayers()) do getgenv().RedHandedESP[v.Name]:Remove() getgenv().RedHandedESP[v.Name] = nil end end)
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
 	end)
@@ -140,7 +140,7 @@ table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(f
 			notify("❌", "Scanning stopped, You died.")
 			LPDied:Disconnect()
 			TargetDiedTrigger:Disconnect()
-			for _,v in ipairs(getgenv().ESPList) do v:Remove() end
+			--for _,v in ipairs(getgenv().ESPList) do v:Remove() end
 		end)
 	end)
 
@@ -162,7 +162,7 @@ LPDied = Players.LocalPlayer.Character.Humanoid.Died:Connect(function()
 		notify("❌", "Scanning stopped, You died.")
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
-		for _,v in ipairs(getgenv().ESPList) do v:Remove() end
+		--for _,v in ipairs(getgenv().ESPList) do v:Remove() end
 	end)
 end)
 
