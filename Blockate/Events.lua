@@ -8,7 +8,9 @@ local function round(number, decimalPlaces)
 end
 
 local function runCommand(text)
-    game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
+    pcall(function()
+        game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
+    end)
 end
 
 local function shout(message)
@@ -155,14 +157,21 @@ return {
         place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5), randomcolor)
         place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5), randomcolor)
-        --[[ Second Layer ]]--
-        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z - 10), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 10), randomcolor)
-        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z - 10), randomcolor)
-        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z + 10), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 10), randomcolor)
-        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z + 10), randomcolor)
+        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 8), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 8), randomcolor)
+        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z + 8), randomcolor)
+        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z + 8), randomcolor)
+        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z - 8), randomcolor)
+        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z - 8), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 8), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 8), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 8), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 8), randomcolor)
+        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z - 5), randomcolor)
     end
 }
