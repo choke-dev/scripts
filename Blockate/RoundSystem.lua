@@ -18,6 +18,7 @@ local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-
 
 --[[ Variables ]]--
 local PAUSED = true
+local STOP = false
 
 --[[ Functions ]]--
 local function shout(message)
@@ -65,13 +66,21 @@ task.spawn(function()
     end)
 end)
 
+Players.LocalPlayer.Chatted:Connect(function(message)
+    if message == "!stop" then
+        STOP = true
+    end
+end)
+
 while true do
+    if STOP then shout("🚫 Stopping...") break end
     if PAUSED then repeat task.wait(1); shout([[
         ⏳
 
 
-
-
+        Blockate Round System
+        built by choke
+        v1.0.1
 
 
         Round paused. Waiting for players...
