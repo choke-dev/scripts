@@ -17,8 +17,7 @@ end
 
 local function place(position)
     -- i hate blockate coordinates
-    position = tostring((math.round(position.X / 4)).." "..(math.round(position.Y / 4)).."- "..(math.round(position.Z / 4)).."/0")
-    print(position)
+    position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y - 5) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
     
     game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
         ["Reflectance"] = 0,
@@ -113,9 +112,9 @@ return {
         shout("New fog radius: "..fog)
         runCommand("!fog "..fog)
     end,
-    ["PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
+    ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
-        place(Vector3.new(HRPos.X, HRPos.Y - 2, HRPos.Z))
+        place(HRPos)
     end
 }
