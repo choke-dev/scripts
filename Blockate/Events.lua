@@ -89,7 +89,7 @@ return {
         runCommand("!ball "..target.Name)
     end,
     ["RANDOM_PLAYER_HUBBED"] = function()
-        if #Players < 10 then return end
+        if #Players:GetPlayers() < 10 then return end
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
     end,
@@ -125,5 +125,18 @@ return {
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
         place(HRPos)
+    end,
+    ["PLATE_PLACED_ON_PLAYER"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
+        local HRPos = target.Character.HumanoidRootPart.Position
+        place(HRPos)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z))
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5))
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5))
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5))
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z))
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5))
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5))
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5))
     end
 }
