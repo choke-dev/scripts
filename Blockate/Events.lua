@@ -92,6 +92,10 @@ return {
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "All players will be teleported to a random player.", 1)
         runCommand("!tp all "..target.Name)
     end,
+    ["RANDOM_PLAYER_RECIEVES_FLIGHT"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given flight.", 1)
+        runCommand("!fly "..target.Name)
+    end,
 
     --[[ World Events ]]--
     ["MODIFY_GRAVITY"] = function()
