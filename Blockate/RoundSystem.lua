@@ -4,6 +4,10 @@ getgenv().BRS_Settings = {
     COUNTDOWN = 5,
     BLACKLISTED_PLAYERS = {
         game:GetService("Players").LocalPlayer.UserId
+    },
+    SOUNDS = {
+        1837879082,
+        9047050075
     }
 }
 --[[ Services ]]--
@@ -52,6 +56,13 @@ task.spawn(function()
             PAUSED = true
         end
     end
+end)
+
+task.spawn(function()
+    local audio = workspace.Audio.DidLoop:Connect(function()
+        local newAudio = getgenv().BRS_Settings.SOUNDS[math.random(1, #getgenv().BRS_Settings.SOUNDS)]
+        runCommand("!sound "..newAudio)
+    end)
 end)
 
 while true do

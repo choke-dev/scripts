@@ -17,14 +17,14 @@ local function shout(message)
     end)
 end
 
-local function place(position)
+local function place(position, color)
     -- i hate blockate coordinates
     position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y - 5) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
     
     game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
         ["Reflectance"] = 0,
         ["CanCollide"] = true,
-        ["Color"] = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255)),
+        ["Color"] = color,
         ["LightColor"] = Color3.new(1,1,1),
         ["Transparency"] = 0,
         ["Size"] = 2,
@@ -59,8 +59,10 @@ local function countdown(startingNum, text, eventType)
 
     if eventType == 1 then
         return getRandomPlayer(), text
-    elseif eventType == 2 then
-        return math.random(5, 200), text
+    elseif eventType == 2 then -- fog
+        return math.random(300, 600), text
+    elseif eventType == 3 then -- gravity
+        return math.random(10, 200), text
     end
 end
 
@@ -104,9 +106,9 @@ return {
 
     --[[ World Events ]]--
     ["MODIFY_GRAVITY"] = function()
-        local gravity = countdown(getgenv().BRS_Settings.COUNTDOWN, "The world gravity is changing!", 2)
+        local gravity = countdown(getgenv().BRS_Settings.COUNTDOWN, "The world gravity is changing!", 3)
         for i = 1, 6 do
-            shout("Choosing new world gravity: "..math.random(5, 200))
+            shout("Choosing new world gravity: "..math.random(10, 200))
             task.wait(0.5)
         end
         shout("New world gravity: "..gravity)
@@ -115,7 +117,7 @@ return {
     ["MODIFY_FOG"] = function()
         local fog = countdown(getgenv().BRS_Settings.COUNTDOWN, "The fog radius is changing!", 2)
         for i = 1, 6 do
-            shout("Choosing new fog radius: "..math.random(5, 200))
+            shout("Choosing new fog radius: "..math.random(300, 600))
             task.wait(0.3)
         end
         shout("New fog radius: "..fog)
@@ -124,19 +126,40 @@ return {
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
-        place(HRPos)
+        place(HRPos, Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255)))
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
+        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         place(HRPos)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z))
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5))
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5))
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5))
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z))
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5))
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5))
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5))
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5), randomcolor)
+    end,
+    ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
+        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5), randomcolor)
+        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5), randomcolor)
+        --[[ Second Layer ]]--
+        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z - 10), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 10), randomcolor)
+        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z - 10), randomcolor)
+        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z), randomcolor)
+        place(Vector3.new(HRPos.X + 10, HRPos.Y, HRPos.Z + 10), randomcolor)
+        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 10), randomcolor)
+        place(Vector3.new(HRPos.X - 10, HRPos.Y, HRPos.Z + 10), randomcolor)
     end
 }
