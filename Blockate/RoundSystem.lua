@@ -18,7 +18,6 @@ local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-
 
 --[[ Variables ]]--
 local PAUSED = true
-local STOP = false
 
 --[[ Functions ]]--
 local function shout(message)
@@ -59,27 +58,13 @@ task.spawn(function()
     end
 end)
 
-task.spawn(function()
-    local audio = workspace.Audio.DidLoop:Connect(function()
-        local newAudio = getgenv().BRS_Settings.SOUNDS[math.random(1, #getgenv().BRS_Settings.SOUNDS)]
-        runCommand("!sound "..newAudio)
-    end)
-end)
-
-Players.LocalPlayer.Chatted:Connect(function(message)
-    if message == "!stop" then
-        STOP = true
-    end
-end)
-
 while true do
-    if STOP then shout("🚫 Stopping...") break end
-    if PAUSED then repeat task.wait(1); shout([[
+    if PAUSED then repeat task.wait(3.1); shout([[
         ⏳
 
 
         Blockate Round System
-        built by choke
+        built by choke-dev on github
         v1.0.1
 
 
