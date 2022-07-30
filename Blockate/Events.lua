@@ -29,7 +29,7 @@ local function getTwoCorners(centerPosition:Vector3, size:number)
     return Vector3.new(x, y, z), Vector3.new(x2, y2, z2)
 end
 
-local function place(blockateposition, color)
+local function place(blockateposition, color, material)
     -- i hate blockate coordinates
     blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
     
@@ -40,7 +40,7 @@ local function place(blockateposition, color)
         ["LightColor"] = Color3.new(1,1,1),
         ["Transparency"] = 0,
         ["Size"] = 2,
-        ["Material"] = 15,
+        ["Material"] = material or math.random(0, 35),
         ["Shape"] = 1,
         ["Light"] = 0
     })
@@ -147,13 +147,16 @@ return {
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
-        place(HRPos, Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255)))
+        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+        local randommaterial = math.random(1, 35)
+        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
+        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 3, randomcolor, randommaterial)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
@@ -161,6 +164,7 @@ return {
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
+        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 5, randomcolor, randommaterial)
     end,
     ["GIGANTIC_PLATE_PLACED_ON_PLAYER"] = function()
@@ -168,6 +172,7 @@ return {
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
+        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 7, randomcolor, randommaterial)
     end,
 }
