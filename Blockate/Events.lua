@@ -23,7 +23,7 @@ local function place(position, color)
     -- i hate blockate coordinates
     position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y - 5) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
     
-    return game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
+    local block =  game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
         ["Reflectance"] = 0,
         ["CanCollide"] = true,
         ["Color"] = color,
@@ -34,6 +34,7 @@ local function place(position, color)
         ["Shape"] = 1,
         ["Light"] = 0
     })
+    return block.Position
 end
 
 local function getRandomPlayer()
