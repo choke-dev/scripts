@@ -34,6 +34,9 @@ local function place(position, color)
         ["Shape"] = 1,
         ["Light"] = 0
     })
+    print(block.Name)
+    print(type(block))
+    print(typeof(block))
     pcall(function()
         return block.Position
     end)
