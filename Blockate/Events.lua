@@ -34,7 +34,9 @@ local function place(position, color)
         ["Shape"] = 1,
         ["Light"] = 0
     })
-    return block.Position
+    pcall(function()
+        return block.Position
+    end)
 end
 
 local function getRandomPlayer()
