@@ -129,7 +129,11 @@ end
 table.insert(getgenv().Connections, Players.LocalPlayer.CharacterAdded:Connect(function(character)
 	pcall(function()
 		for _,v in pairs(ESPList) do v:Remove() end
-		--task.spawn(function() for _,v in pairs(Players:GetPlayers()) do getgenv().RedHandedESP[v.Name]:Remove() getgenv().RedHandedESP[v.Name] = nil end end)
+		task.spawn(function() 
+			for _,v in pairs(Players:GetPlayers()) do
+				getgenv().RedHandedESP[v.Name] = nil 
+			end 
+		end)
 		LPDied:Disconnect()
 		TargetDiedTrigger:Disconnect()
 	end)
@@ -195,7 +199,7 @@ end
 
 Players.PlayerAdded:Connect(function(player)
 	player:WaitForChild("RedHanded"):GetPropertyChangedSignal("Value"):Connect(function()
-		task.wait()
+		task.wait()	
 		local success, err = pcall(function()
 			if player.RedHanded.Value and inGame and Players.LocalPlayer.Team.Name == "Police" or Players.LocalPlayer.Backpack:FindFirstChild("Fake Check Target") and not CollectionService:HasTag(player.Character, "RedHanded") then
 				CollectionService:AddTag(player.Character, "RedHanded")
@@ -204,7 +208,7 @@ Players.PlayerAdded:Connect(function(player)
 				CollectionService:RemoveTag(player.Character, "RedHanded")
 				getgenv().RedHandedESP[player.Name]:Remove()
 				task.wait()
-				getgenv().RedHandedESP[player.Name] = nil
+				--getgenv().RedHandedESP[player.Name] = nil
 			end
 		end)
 		if not success then warn("An Error Occured while trying to configure Red-Handed ESP on a player:\n\n"..err) end
