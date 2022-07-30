@@ -144,13 +144,20 @@ return {
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
-        fill(HRPos, 2, randomcolor, randommaterial)
+        fill(HRPos, 3, randomcolor, randommaterial)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A large plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
-        fill(HRPos, 3, randomcolor, randommaterial)
-    end
+        fill(HRPos, 5, randomcolor, randommaterial)
+    end,
+    ["GIGANTIC_PLATE_PLACED_ON_PLAYER"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A GIANT plate will be placed on a random player.", 1)
+        local HRPos = target.Character.HumanoidRootPart.Position
+        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+        local randommaterial = math.random(1, 35)
+        fill(HRPos, 7, randomcolor, randommaterial)
+    end,
 }
