@@ -19,6 +19,16 @@ local function shout(message)
     end)
 end
 
+local function getTwoCorners(centerPosition:Vector3, size:number)
+    local x = centerPosition.X - size
+    local y = centerPosition.Y - size
+    local z = centerPosition.Z - size
+    local x2 = centerPosition.X + size
+    local y2 = centerPosition.Y + size
+    local z2 = centerPosition.Z + size
+    return Vector3.new(x, y, z), Vector3.new(x2, y2, z2)
+end
+
 local function place(blockateposition, color)
     -- i hate blockate coordinates
     blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
