@@ -146,33 +146,41 @@ return {
     end,
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
+        task.spawn(function()
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
         place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+        end)
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
+        task.spawn(function()
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
         place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 3, randomcolor, randommaterial)
+        end)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A large plate will be placed on a random player.", 1)
+        task.spawn(function()
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
         place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 5, randomcolor, randommaterial)
+        end)
     end,
-    ["GIGANTIC_PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A GIANT plate will be placed on a random player.", 1)
+    ["HUGE_PLATE_PLACED_ON_PLAYER"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A HUGE plate will be placed on a random player.", 1)
+        task.spawn(function()
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         local randommaterial = math.random(1, 35)
         place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         fill(HRPos, 7, randomcolor, randommaterial)
+        end)
     end,
 }
