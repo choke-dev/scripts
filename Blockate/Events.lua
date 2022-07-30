@@ -34,7 +34,15 @@ local function place(blockateposition, color)
         ["Shape"] = 1,
         ["Light"] = 0
     })
-    return block.Position
+end
+
+local function fill(centerPosition:Vector3, radius:number, color:Color3, material:number)
+    local x, y = getTwoCorners(centerPosition, ((radius - 1) * 2))
+    for x1 = x.X, y.X, 4 do
+        for z1 = x.Z, y.Z, 4 do
+            place(Vector3.new(x1, HRPos.Y - 4, z1), color, material)
+        end
+    end
 end
 
 local function getRandomPlayer()
@@ -135,46 +143,14 @@ return {
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
         local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        HRPos = place(Vector3.new(HRPos.X, HRPos.Y - 5, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5), randomcolor)
+        local randommaterial = math.random(1, 35)
+        fill(HRPos, 2, randomcolor, randommaterial)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A large plate will be placed on a random player.", 1)
-        local Temp_HRPos = target.Character.HumanoidRootPart.Position
-        local HRPos = Temp_HRPos
-        Temp_HRPos = nil
+        local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        HRPos = place(Vector3.new(HRPos.X, HRPos.Y - 5, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 8), randomcolor)
-        place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z + 8), randomcolor)
-        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z + 8), randomcolor)
-        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z + 8), randomcolor)
-        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z - 8), randomcolor)
-        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z - 8), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 8), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z + 8), randomcolor)
-        place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z + 8), randomcolor)
-        place(Vector3.new(HRPos.X + 5, HRPos.Y, HRPos.Z - 8), randomcolor)
-        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z - 5), randomcolor)
-        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X - 8, HRPos.Y, HRPos.Z + 5), randomcolor)
-        place(Vector3.new(HRPos.X + 8, HRPos.Y, HRPos.Z - 5), randomcolor)
+        local randommaterial = math.random(1, 35)
+        fill(HRPos, 3, randomcolor, randommaterial)
     end
 }
