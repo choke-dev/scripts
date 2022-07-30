@@ -19,11 +19,11 @@ local function shout(message)
     end)
 end
 
-local function place(position, color)
+local function place(blockateposition, color)
     -- i hate blockate coordinates
-    position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
+    blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
     
-    local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
+    local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
         ["Reflectance"] = 0,
         ["CanCollide"] = true,
         ["Color"] = color,
@@ -34,12 +34,7 @@ local function place(position, color)
         ["Shape"] = 1,
         ["Light"] = 0
     })
-    print(block.Name)
-    print(type(block))
-    print(typeof(block))
-    pcall(function()
-        return block.Position
-    end)
+    return block.Position
 end
 
 local function getRandomPlayer()
@@ -138,9 +133,7 @@ return {
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
-        local Temp_HRPos = target.Character.HumanoidRootPart.Position
-        local HRPos = Temp_HRPos
-        Temp_HRPos = nil
+        local HRPos = target.Character.HumanoidRootPart.Position
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
         HRPos = place(Vector3.new(HRPos.X, HRPos.Y - 5, HRPos.Z), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
