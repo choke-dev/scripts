@@ -21,7 +21,7 @@ end
 
 local function place(position, color)
     -- i hate blockate coordinates
-    position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y - 5) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
+    position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
     
     local block =  game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
         ["Reflectance"] = 0,
