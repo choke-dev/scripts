@@ -47,8 +47,7 @@ local function place(blockateposition, color, material)
 end
 
 local function fill(centerPosition:Vector3, radius:number, color:Color3, material:number)
-    local x
-corner1, corner2 = getTwoCorners(centerPosition, ((radius - 1) * 2))
+    local corner1, corner2 = getTwoCorners(centerPosition, ((radius - 1) * 2))
     for x1 = corner1.X, corner2.X, 4 do
         for z1 = corner1.Z, corner2.Z, 4 do
             place(Vector3.new(x1, HRPos.Y - 4, z1), color, material)
