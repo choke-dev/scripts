@@ -23,7 +23,7 @@ local function place(position, color)
     -- i hate blockate coordinates
     position = tostring((math.round(position.X / 4)).." "..(math.round((position.Y) / 4)).."+ "..(math.round(position.Z / 4)).."/0")
     
-    local block =  game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
+    local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(position, {
         ["Reflectance"] = 0,
         ["CanCollide"] = true,
         ["Color"] = color,
@@ -137,7 +137,7 @@ return {
         local HRPos = Temp_HRPos
         Temp_HRPos = nil
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        HRPos = place(HRPos, randomcolor)
+        HRPos = place(Vector3.new(HRPos.X, HRPos.Y - 5, HRPos.Z), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
         place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
@@ -153,7 +153,7 @@ return {
         local HRPos = Temp_HRPos
         Temp_HRPos = nil
         local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        HRPos = place(HRPos, randomcolor)
+        HRPos = place(Vector3.new(HRPos.X, HRPos.Y - 5, HRPos.Z), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z), randomcolor)
         place(Vector3.new(HRPos.X - 5, HRPos.Y, HRPos.Z - 5), randomcolor)
         place(Vector3.new(HRPos.X, HRPos.Y, HRPos.Z - 5), randomcolor)
