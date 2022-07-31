@@ -1,6 +1,9 @@
 --[[ Services ]]--
 local Players = game:GetService("Players")
 
+--[[ Variables ]]--
+local BuilderPerm = {}
+
 --[[ Functions ]]--
 local function round(number, decimalPlaces)
     local decplaces = decimalPlaces or 0
@@ -89,6 +92,19 @@ end
 
 --[[ Main Events ]]--
 
+task.spawn(function()
+    while true do
+        task.wait(1)
+        for i,v in pairs(BuilderPerm) do
+            BuilderPerm[i] -= 1
+        end
+        if v <= 0 then
+            runCommand("!perm "..i.." visitor")
+            BuilderPerm[i] = nil
+        end
+    end
+end)
+
 return {
     --[[ Player Events ]]--
     ["RANDOM_PLAYER_KILLED"] = function()
@@ -123,6 +139,11 @@ return {
     ["RANDOM_PLAYER_RECIEVES_FLIGHT"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given flight.", 1)
         runCommand("!fly "..target.Name)
+    end,
+    ["RANDOM_PLAYER_RECIEVES_BUILDER"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given [🔨 Builder] permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds.", 1)
+        runCommand("!perm "..target.Name.." builder")
+        BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
     end,
 
     --[[ World Events ]]--
