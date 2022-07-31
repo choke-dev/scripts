@@ -76,6 +76,7 @@ task.spawn(function()
             shout("📥 Fetching new events file...")
             Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
             shout("✅ Events file updated!")
+            UPDATING = false
         end
     end)
 end)

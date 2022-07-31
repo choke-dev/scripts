@@ -1,94 +1,86 @@
--- // Services \\ --
+--[[ Services ]]--
 local Players = game:GetService("Players")
 
--- // Modules \\ --
+--[[ Modules ]]--
 local ESP = loadstring(game:HttpGet("https://kiriot22.com/releases/ESP.lua"))()
-local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))(); local Notify = AkaliNotif.Notify;
+synlog = NEON:github('belkworks', 'synlog')
 
--- // Variables \\ --
+--[[ Variables ]]--
 local Target
-local CurrentGamemode
+local GameMode
 local ServerState
-local InGame
-local ContactTriggered
-local TargetDied
-local TargetESP
-local LocalPlayerDied
+
+--[[ Tables ]]--
 local SupportedModes = {"Framed","Contacts","No Secrets"}
 
--- // Functions  \\ --
-local function notify(text, desc, time)
-    if not getgenv().FramedTESP_Notifications then return end
-    Notify({
-        Description = desc or "Description";
-        Title = text or "Title";
-        Duration = time or 3
-    });
-end
-
-local function AddESP(playerName, text, color, istemp)
-    if not istemp then istemp = true end
+--[[ Functions ]]--
+function AddESP(playerName:string, text:string, color:Color3)
 	ESP.Color = Color3.fromRGB(112, 112, 112)
     local TEMP_ESP = ESP:Add(Players[playerName].Character.Head, {
         Name = text.."\n\n"..Players[playerName].DisplayName.." (@"..playerName..")",
-        Color = color or Color3.fromRGB(255, 141, 88),
+        Color = color,
         Player = false,
-        IsEnabled = "FramedTargetESP"
+        IsEnabled = gay
     })
-	ESP.FramedTargetESP = true
-	if istemp then
-        table.insert(getgenv().ESPList, TEMP_ESP)
-    end
+	ESP.gay = true
     return TEMP_ESP
 end
 
-local function scanAllowed()
-    if not InGame or InGame == "nil" then 
-        notify("❌", "Not in-game!")
-        return false
-    end
-	if not table.find(SupportedModes, tostring(CurrentGamemode)) then 
-        notify("❌", "Cannot start scan, Gamemode \""..CurrentGamemode.."\" is not supported.", 6.5)
-        return false
-    end
-    return true
+local function RefreshValues()
+    Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
+	GameMode = workspace.Values.GameMode.Value
+	ServerState = workspace.Values.ServerMode.Value
+    synlog:success("Refreshed values.")
 end
 
-local function refreshValues()
-    Target = tostring(workspace.Events.GetTargetLocal:InvokeServer())
-	CurrentGamemode = workspace.Values.GameMode.Value
-	ServerState = workspace.Values.ServerMode.Value
+local function CheckState()
+    if Players.LocalPlayer.Character:WaitForChild("CharacterAttributes", 2) then
+        synlog:info("Function \"CheckState\" returned true.")
+		return true
+	else
+        synlog:info("Function \"CheckState\" returned false.")
+		return false
+	end
+end
+
+local function ScanNewTarget()
+    if not CheckState() then return synlog:error("Function \"ScanNewTarget\" failed, you are not in-game.") end
+    if not table.find(SupportedModes, GameMode) then return synlog:error("Function \"ScanNewTarget\" failed, you are not in a supported game mode.") end
+    RefreshValues()
+    if not Target then return end
+    synlog:success("Found target.")
+    return AddESP(Target.Name, "Target", Color3.fromRGB(255, 244, 88))
 end
 
 local function ScanUndercover()
-    if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then 
-        notify("⌛", "Waiting until game starts before scanning for undercover."); 
-        repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") 
-    end
-        notify("🔎", "Attempting to search for undercover...")
+    if not CheckState() then return synlog:error("Function \"ScanUndercover\" failed, you are not in-game.") end
+    RefreshValues()
+    if not Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until Players.LocalPlayer.Backpack:FindFirstChildWhichIsA("Tool") end
 
     for i,v in ipairs(Players:GetPlayers()) do
-        if v.Team.Name ~= "Framed" and v.Name ~= Players.LocalPlayer.Name then continue end
-        if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
+		if v.Team.Name ~= "Framed" and v.Name ~= Players.LocalPlayer.Name then continue end
+		if not v.Backpack:FindFirstChildWhichIsA("Tool") then repeat task.wait() until v.Backpack:FindFirstChildWhichIsA("Tool") end
+        if not v.Backpack:FindFirstChild("Fake Check Target") then return end
 
-        if v.Backpack:FindFirstChild("Fake Check Target") then
-            AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333), false)
-            notify("🕵️", "Found undercover: "..v.DisplayName)
-        end
-
-    end
- end
-
-local function Scan()
-    if not scanAllowed() then return end
-    refreshValues()
-    if not Target or Target == Players.LocalPlayer.Name then return notify("❌", "No target found!") end
-    TargetESP = AddESP(Target, "Target")
-    TargetDied = Players[Target].Character.Humanoid.Died:Connect(function()
-        TargetDied:Disconnect()
-        TargetESP:Remove()
-        if CurrentGamemode == "Contacts" then return end
-        Scan()
-    end)
-    ScanUndercover()
+        synlog:success("Found undercover.")
+		return AddESP(v.Name, "Undercover", Color3.new(0, 1, 0.333333))
+	end
 end
+
+local function SetupDiedEvent()
+    local DiedEvent = Players.LocalPlayer.Character:WaitForChild("Humanoid").Died:Connect(function()
+        DiedEvent:Disconnect()
+    end)
+end
+
+--[[ Events ]]--
+Players.LocalPlayer.CharacterAdded:Connect(function()
+    
+end)
+
+--[[
+
+ESP:Toggle(true)
+ESP.Players = false
+
+]]
