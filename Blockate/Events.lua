@@ -61,6 +61,7 @@ end
 local function getRandomPlayer()
     local players = Players:GetPlayers()
     local randomPlayer = players[math.random(1, #players)]
+    if #Players:GetPlayers() == 1 then return Players.LocalPlayer end
     if table.find(getgenv().BRS_Settings.BLACKLISTED_PLAYERS, randomPlayer.UserId) then return getRandomPlayer() end
     return randomPlayer
 end
@@ -102,7 +103,9 @@ task.spawn(function()
         for i,v in pairs(BuilderPerm) do
             BuilderPerm[i] = v - 1
             print(i.."'s builder time left: "..v)
-            if v == 15 then
+            if v == 30 then
+                whisper(i, "⚠️ You have 30 seconds remaining until your builder permission expires.")
+            elseif v == 15 then
                 whisper(i, "⚠️ You have 15 seconds remaining until your builder permission expires.")
             elseif v == 10 then
                 whisper(i, "⚠️ You have 10 seconds remaining until your builder permission expires.")

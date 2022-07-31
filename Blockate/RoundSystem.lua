@@ -11,7 +11,7 @@ getgenv().BRS_Settings = {
     },
     EVENT_CONFIG = {
         REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT = 15,
-        BUILDER_PERM_DURATION = 30
+        BUILDER_PERM_DURATION = 60
     }
 }
 --[[ Services ]]--
