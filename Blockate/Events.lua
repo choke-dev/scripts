@@ -110,13 +110,13 @@ task.spawn(function()
             if v == 30 then
                 whisper(i, "⚠️ You have 30 seconds remaining until your builder permission expires.")
             elseif v == 15 then
-                whisper(i, "⚠️ You have 15 seconds remaining until your builder permission expires.")
+                whisper(i, "❕ You have 15 seconds remaining until your builder permission expires.")
             elseif v == 10 then
-                whisper(i, "⚠️ You have 10 seconds remaining until your builder permission expires.")
+                whisper(i, "❗ You have 10 seconds remaining until your builder permission expires.")
             elseif v == 5 then
-                whisper(i, "⚠️ You have 5 seconds remaining until your builder permission expires.")
+                whisper(i, "‼️ You have 5 seconds remaining until your builder permission expires.")
             elseif v <= 0 then
-                whisper(i, "⚠️ Your builder permission has expired.")
+                whisper(i, "❌ Your builder permission has expired.")
                 runCommand("!perm "..i.." visitor")
                 BuilderPerm[i] = nil
             end
@@ -168,10 +168,10 @@ return {
         runCommand("!perm "..target.Name.." builder")
         if BuilderPerm[target.Name] then
             BuilderPerm[target.Name] += getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
-            whisper(target.Name, "✅ Your builder permissions have been extended for "..BuilderPerm[target.Name].." seconds!")
+            whisper(target.Name, "🍀 Your builder permission timer has been extended by +60 seconds!")
         else
             BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
-            whisper(target.Name, "✅ You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
+            whisper(target.Name, "🔨 You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
         end
     end,
 
@@ -190,9 +190,10 @@ return {
         task.spawn(function()
             runCommand("!filter brightness 1")
             for i = 0.9, 0, -0.1 do
-                task.wait(0.5)
+                task.wait(0.3)
                 runCommand("!filter brightness "..i)
             end
+            runCommand("!filter brightness 0") -- for good measure
         end)
     end,
     ---[[[ Plate Events ]]]---
