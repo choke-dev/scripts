@@ -8,6 +8,9 @@ getgenv().BRS_Settings = {
     SOUNDS = {
         1837879082,
         9047050075
+    },
+    EVENT_CONFIG = {
+        HUB_EVENT = 15
     }
 }
 --[[ Services ]]--
