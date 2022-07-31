@@ -159,7 +159,7 @@ return {
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
         whisper(target.Name, "✅ You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
         runCommand("!perm "..target.Name.." builder")
-        BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
+        BuilderPerm[target.Name] += getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
     end,
 
     --[[ World Events ]]--
@@ -171,15 +171,6 @@ return {
         end
         shout("New world gravity: "..gravity)
         runCommand("!gravity "..gravity)
-    end,
-    ["MODIFY_FOG"] = function()
-        local fog = countdown(getgenv().BRS_Settings.COUNTDOWN, "The fog radius is changing!", 2)
-        for i = 1, 6 do
-            shout("Choosing new fog radius: "..math.random(300, 600))
-            task.wait(0.3)
-        end
-        shout("New fog radius: "..fog)
-        runCommand("!fog "..fog)
     end,
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
@@ -221,3 +212,15 @@ return {
         end)
     end,
 }
+
+--[[
+    ["MODIFY_FOG"] = function()
+        local fog = countdown(getgenv().BRS_Settings.COUNTDOWN, "The fog radius is changing!", 2)
+        for i = 1, 6 do
+            shout("Choosing new fog radius: "..math.random(300, 600))
+            task.wait(0.3)
+        end
+        shout("New fog radius: "..fog)
+        runCommand("!fog "..fog)
+    end,
+]]
