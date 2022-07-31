@@ -128,7 +128,7 @@ return {
         runCommand("!ball "..target.Name)
     end,
     ["RANDOM_PLAYER_HUBBED"] = function()
-        if #Players:GetPlayers() < getgenv().BRS_Settings.EVENT_CONFIG.HUB_EVENT then return end
+        if #Players:GetPlayers() < getgenv().BRS_Settings.EVENT_CONFIG.REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT then return end
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
     end,
