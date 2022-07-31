@@ -96,11 +96,11 @@ task.spawn(function()
     while true do
         task.wait(1)
         for i,v in pairs(BuilderPerm) do
-            BuilderPerm[i] -= 1
-        end
-        if v <= 0 then
-            runCommand("!perm "..i.." visitor")
-            BuilderPerm[i] = nil
+            BuilderPerm[i] = v - 1
+            if v <= 0 then
+                runCommand("!perm "..i.." visitor")
+                BuilderPerm[i] = nil
+            end
         end
     end
 end)
