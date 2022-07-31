@@ -58,7 +58,7 @@ end
 task.spawn(function()
     while true do
         task.wait()
-        if UPDATING then return end
+        if UPDATING then repeat task.wait() until not UPDATING end
         if playerCount > 1 then
             PAUSED = false
         else
