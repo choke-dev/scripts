@@ -19,6 +19,7 @@ local function runCommand(text)
     end)
 end
 
+
 local function shout(message)
     pcall(function()
         game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
@@ -164,9 +165,14 @@ return {
     end,
     ["RANDOM_PLAYER_RECIEVES_BUILDER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
-        whisper(target.Name, "✅ You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
         runCommand("!perm "..target.Name.." builder")
-        BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
+        if BuilderPerm[target.Name] then
+            BuilderPerm[target.Name] += getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
+            whisper(target.Name, "✅ Your builder permissions have been extended for "..BuilderPerm[target.Name].." seconds!")
+        else
+            BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
+            whisper(target.Name, "✅ You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
+        end
     end,
 
     --[[ World Events ]]--
@@ -179,6 +185,17 @@ return {
         shout("New world gravity: "..gravity)
         runCommand("!gravity "..gravity)
     end,
+    ["FLASHBANG"] = function()
+        countdown(getgenv().BRS_Settings.COUNTDOWN, "FLASHBANG!", 2)
+        task.spawn(function()
+            runCommand("!filter brightness 1")
+            for i = 0.9, 0, -0.1 do
+                task.wait(0.5)
+                runCommand("!filter brightness "..i)
+            end
+        end)
+    end,
+    ---[[[ Plate Events ]]]---
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
         task.spawn(function()

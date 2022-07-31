@@ -25,6 +25,7 @@ local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-
 
 --[[ Variables ]]--
 local PAUSED = true
+local UPDATING = false
 
 --[[ Functions ]]--
 local function shout(message)
@@ -57,12 +58,26 @@ end
 task.spawn(function()
     while true do
         task.wait()
+        if UPDATING then return end
         if playerCount > 1 then
             PAUSED = false
         else
             PAUSED = true
         end
     end
+end)
+
+task.spawn(function()
+    Players.LocalPlayer.Chatted:Connect(function(msg)
+        if msg == "/update" then
+            UPDATING = true
+            PAUSED = true
+            shout("☁ Updating...")
+            shout("📥 Fetching new events file...")
+            Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
+            shout("✅ Events file updated!")
+        end
+    end)
 end)
 
 while true do
