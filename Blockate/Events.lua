@@ -1,6 +1,9 @@
 --[[ Services ]]--
 local Players = game:GetService("Players")
 
+--[[ Modules ]]--
+local GearIDs = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Dependencies/GearIDs.lua",true))()
+
 --[[ Variables ]]--
 local BuilderPerm = {}
 
@@ -146,6 +149,10 @@ return {
         if #Players:GetPlayers() < getgenv().BRS_Settings.EVENT_CONFIG.REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT then return end
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
+    end,
+    ["RANDOM_PLAYER_RECIEVES_GEAR"] = function()
+        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will receive a random gear.", 1)
+        runCommand("!gear "..target.Name.." "..GearIDs[math.random(1, #GearIDs)])
     end,
     ["ALL_PLAYERS_TP_TO_PLAYER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "All players will be teleported to a random player.", 1)

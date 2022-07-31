@@ -7,7 +7,10 @@ getgenv().BRS_Settings = {
     },
     SOUNDS = {
         1837879082,
-        9047050075
+        9047050075,
+        7023887630,
+        9048039534,
+        1846368080,
     },
     EVENT_CONFIG = {
         REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT = 15,
