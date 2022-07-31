@@ -157,6 +157,7 @@ return {
     end,
     ["RANDOM_PLAYER_RECIEVES_BUILDER"] = function()
         local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
+        whisper(target.Name, "✅ You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
         runCommand("!perm "..target.Name.." builder")
         BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
     end,
