@@ -70,8 +70,8 @@ local function getRandomPlayer()
     return randomPlayer
 end
 
-local function countdown(startingNum, text, eventType)
-    for i = startingNum, 0, -1 do
+local function countdown(text, eventType)
+    for i = getgenv().BRS_Settings.COUNTDOWN, 0, -1 do
         shout(([[
         %s
 
@@ -127,44 +127,44 @@ end)
 return {
     --[[ Player Events ]]--
     ["RANDOM_PLAYER_KILLED"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will die.", 1)
+        local target = countdown("A random player will die.", 1)
         runCommand("!kill "..target.Name)
     end,
     ["RANDOM_PLAYER_GETS_SWORD"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will get a sword.", 1)
+        local target = countdown("A random player will get a sword.", 1)
         runCommand("!gear "..target.Name.." sword")
     end,
     ["RANDOM_PLAYER_FLINGED"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be flung.", 1)
+        local target = countdown("A random player will be flung.", 1)
         runCommand("!fling "..target.Name)
     end,
     ["RANDOM_PLAYER_TRIPPED"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be tripped.", 1)
+        local target = countdown("A random player will be tripped.", 1)
         runCommand("!trip "..target.Name)
     end,
     ["RANDOM_PLAYER_BALLED"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be balled.", 1)
+        local target = countdown("A random player will be balled.", 1)
         runCommand("!ball "..target.Name)
     end,
     ["RANDOM_PLAYER_HUBBED"] = function()
         if #Players:GetPlayers() < getgenv().BRS_Settings.EVENT_CONFIG.REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT then return end
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be hubbed.", 1)
+        local target = countdown("A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
     end,
     ["RANDOM_PLAYER_RECIEVES_GEAR"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will receive a random gear.", 1)
+        local target = countdown("A random player will receive a random gear.", 1)
         runCommand("!gear "..target.Name.." "..GearIDs[math.random(1, #GearIDs)])
     end,
     ["ALL_PLAYERS_TP_TO_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "All players will be teleported to a random player.", 1)
+        local target = countdown("All players will be teleported to a random player.", 1)
         runCommand("!tp all "..target.Name)
     end,
     ["RANDOM_PLAYER_RECIEVES_FLIGHT"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given flight.", 1)
+        local target = countdown("A random player will be given flight.", 1)
         runCommand("!fly "..target.Name)
     end,
     ["RANDOM_PLAYER_RECIEVES_BUILDER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
+        local target = countdown("A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
         runCommand("!perm "..target.Name.." builder")
         if BuilderPerm[target.Name] then
             BuilderPerm[target.Name] += getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
@@ -177,7 +177,7 @@ return {
 
     --[[ World Events ]]--
     ["MODIFY_GRAVITY"] = function()
-        local gravity = countdown(getgenv().BRS_Settings.COUNTDOWN, "The world gravity is changing!", 3)
+        local gravity = countdown("The world gravity is changing!", 3)
         for i = 1, 6 do
             shout("Choosing new world gravity: "..math.random(10, 200))
             task.wait(0.5)
@@ -186,7 +186,7 @@ return {
         runCommand("!gravity "..gravity)
     end,
     ["FLASHBANG"] = function()
-        countdown(getgenv().BRS_Settings.COUNTDOWN, "FLASHBANG!", 2)
+        countdown("FLASHBANG!", 2)
         task.spawn(function()
             runCommand("!filter brightness 1")
             for i = 0.9, 0, -0.1 do
@@ -198,49 +198,49 @@ return {
     end,
     ---[[[ Plate Events ]]]---
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A small plate will be placed on a random player.", 1)
+        local target = countdown("A small plate will be placed on a random player.", 1)
         task.spawn(function()
-        local HRPos = target.Character.HumanoidRootPart.Position
-        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        local randommaterial = math.random(1, 35)
-        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            local HRPos = target.Character.HumanoidRootPart.Position
+            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randommaterial = math.random(1, 35)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         end)
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A plate will be placed on a random player.", 1)
+        local target = countdown("A plate will be placed on a random player.", 1)
         task.spawn(function()
-        local HRPos = target.Character.HumanoidRootPart.Position
-        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        local randommaterial = math.random(1, 35)
-        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
-        fill(HRPos, 3, randomcolor, randommaterial)
+            local HRPos = target.Character.HumanoidRootPart.Position
+            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randommaterial = math.random(1, 35)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            fill(HRPos, 3, randomcolor, randommaterial)
         end)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A large plate will be placed on a random player.", 1)
+        local target = countdown("A large plate will be placed on a random player.", 1)
         task.spawn(function()
-        local HRPos = target.Character.HumanoidRootPart.Position
-        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        local randommaterial = math.random(1, 35)
-        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
-        fill(HRPos, 5, randomcolor, randommaterial)
+            local HRPos = target.Character.HumanoidRootPart.Position
+            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randommaterial = math.random(1, 35)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            fill(HRPos, 5, randomcolor, randommaterial)
         end)
     end,
     ["HUGE_PLATE_PLACED_ON_PLAYER"] = function()
-        local target = countdown(getgenv().BRS_Settings.COUNTDOWN, "A HUGE plate will be placed on a random player.", 1)
+        local target = countdown("A HUGE plate will be placed on a random player.", 1)
         task.spawn(function()
-        local HRPos = target.Character.HumanoidRootPart.Position
-        local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        local randommaterial = math.random(1, 35)
-        place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
-        fill(HRPos, 7, randomcolor, randommaterial)
+            local HRPos = target.Character.HumanoidRootPart.Position
+            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randommaterial = math.random(1, 35)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            fill(HRPos, 7, randomcolor, randommaterial)
         end)
     end,
 }
 
 --[[
     ["MODIFY_FOG"] = function()
-        local fog = countdown(getgenv().BRS_Settings.COUNTDOWN, "The fog radius is changing!", 2)
+        local fog = countdown("The fog radius is changing!", 2)
         for i = 1, 6 do
             shout("Choosing new fog radius: "..math.random(300, 600))
             task.wait(0.3)
