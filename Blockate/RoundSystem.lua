@@ -8,9 +8,12 @@ getgenv().BRS_Settings = {
     SOUNDS = {
         1837879082,
         9047050075,
-        7023887630,
-        9048039534,
-        1846368080,
+        1837454064,
+        1837429944,
+        9048375035,
+        1838055069,
+        9047050075,
+        1845554017
     },
     EVENT_CONFIG = {
         REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT = 15,
@@ -28,6 +31,12 @@ local PAUSED = true
 local UPDATING = false
 
 --[[ Functions ]]--
+local function runCommand(text)
+    pcall(function()
+        game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
+    end)
+end
+
 local function shout(message)
     pcall(function()
         game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
@@ -65,6 +74,28 @@ task.spawn(function()
             PAUSED = true
         end
     end
+end)
+
+task.spawn(function()
+    local function getNewSound()
+        local newSound = getgenv().BRS_Settings.SOUNDS[math.random(1,#getgenv().BRS_Settings.SOUNDS)]
+        if workspace.Audio.SoundId == "rbxassetid://"..newSound then
+            getNewSound()
+        else
+            return newSound
+        end
+    end
+
+    local debounce = false
+
+    workspace:WaitForChild("Audio").DidLoop:Connect(function()
+        if debounce then return end
+        debounce = true
+        local sound = getNewSound()
+        print("Playing sound: "..sound)
+        runCommand("!sound "..sound)
+        debounce = false
+    end)
 end)
 
 task.spawn(function()
