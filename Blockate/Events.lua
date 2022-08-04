@@ -27,12 +27,12 @@ local function shout(message)
 end
 
 local function getTwoCorners(centerPosition:Vector3, size:number)
-    local x = centerPosition.X - size
-    local y = centerPosition.Y - size
-    local z = centerPosition.Z - size
-    local x2 = centerPosition.X + size
-    local y2 = centerPosition.Y + size
-    local z2 = centerPosition.Z + size
+    local x = math.round(centerPosition.X - size)
+    local y = math.round(centerPosition.Y - size)
+    local z = math.round(centerPosition.Z - size)
+    local x2 = math.round(centerPosition.X + size)
+    local y2 = math.round(centerPosition.Y + size)
+    local z2 = math.round(centerPosition.Z + size)
     return Vector3.new(x, y, z), Vector3.new(x2, y2, z2)
 end
 
