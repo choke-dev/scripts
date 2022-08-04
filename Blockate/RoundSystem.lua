@@ -77,25 +77,27 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    local function getNewSound()
-        local newSound = getgenv().BRS_Settings.SOUNDS[math.random(1,#getgenv().BRS_Settings.SOUNDS)]
-        if workspace.Audio.SoundId == "rbxassetid://"..newSound then
-            getNewSound()
-        else
-            return newSound
+    pcall(function()
+        local function getNewSound()
+            local newSound = getgenv().BRS_Settings.SOUNDS[math.random(1,#getgenv().BRS_Settings.SOUNDS)]
+            if workspace.Audio.SoundId == "rbxassetid://"..newSound then
+                return getNewSound()
+            else
+                return newSound
+            end
         end
-    end
 
-    local debounce = false
+        local debounce = false
 
-    workspace:WaitForChild("Audio").DidLoop:Connect(function()
-        if debounce then return end
-        debounce = true
-        local sound = getNewSound()
-        print("Playing sound: "..sound)
-        runCommand("!sound "..sound)
-        debounce = false
-    end)
+        workspace:WaitForChild("Audio").DidLoop:Connect(function()
+            if debounce then return end
+            debounce = true
+            local sound = getNewSound()
+            print("Playing sound: "..sound)
+            runCommand("!sound "..sound)
+            debounce = false
+        end)
+    end) -- too lazy to figure out whats wrong
 end)
 
 task.spawn(function()
