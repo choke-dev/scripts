@@ -114,7 +114,7 @@ task.spawn(function()
             elseif v == 10 then
                 whisper(i, "❗ You have 10 seconds remaining until your builder permission expires.")
             elseif v == 5 then
-                whisper(i, "‼️ You have 5 seconds remaining until your builder permission expires.")
+                whisper(i, "❗❗ You have 5 seconds remaining until your builder permission expires.")
             elseif v <= 0 then
                 whisper(i, "❌ Your builder permission has expired.")
                 runCommand("!perm "..i.." visitor")
