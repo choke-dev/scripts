@@ -119,7 +119,7 @@ while true do
 
         Blockate Round System
         built by choke-dev on github
-        v1.0.4
+        v1.0.5
 
 
         Round paused. Waiting for players...
