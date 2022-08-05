@@ -9,17 +9,25 @@ getgenv().BRS_Settings = {
         1837879082,
         9047050075,
         1837454064,
-        1837429944,
         9048375035,
         1838055069,
         9047050075,
-        1845554017
+        1845554017,
+        1838055069,
+        1837779005,
+        1846458016,
+        9048375773,
+        1836500792
     },
     EVENT_CONFIG = {
         REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT = 15,
         BUILDER_PERM_DURATION = 60
     }
 }
+
+if getgenv().BRS_ALREADY_RAN then return end
+getgenv().BRS_ALREADY_RAN = true
+
 --[[ Services ]]--
 local Players = game:GetService("Players")
 
@@ -88,6 +96,10 @@ task.spawn(function()
         end
 
         local debounce = false
+
+        if not workspace:FindFirstChild("Audio") then
+            runCommand("!sound "..getNewSound())
+        end
 
         workspace:WaitForChild("Audio").DidLoop:Connect(function()
             if debounce then return end
