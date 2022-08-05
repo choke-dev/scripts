@@ -25,14 +25,18 @@ getgenv().BRS_Settings = {
     }
 }
 
-if getgenv().BRS_ALREADY_RAN then return end
-getgenv().BRS_ALREADY_RAN = true
-
 --[[ Services ]]--
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 
 --[[ Modules ]]--
 local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
+local CheckPermModule = require(game:GetService("ReplicatedStorage").Modules.Client.Functions.CheckPerm)
+local FeedbackModule = require(game:GetService("ReplicatedStorage").Modules.Client.LocalCommands)
+
+if not CheckPermModule(2) then return FeedbackModule.feedback("You need admin perms to run this script.", "AlsoChat") end
+if getgenv().BRS_ALREADY_RAN then return FeedbackModule.feedback("Script is already running, if you wish to run a new instance please type \"/stop\".", "AlsoChat") end
+getgenv().BRS_ALREADY_RAN = true
 
 --[[ Variables ]]--
 local PAUSED = true
@@ -134,6 +138,7 @@ task.spawn(function()
             end
             Connections = {}
             print("✅ Stopped!")
+            getgenv().BRS_ALREADY_RAN = false
         end
     end))
 end)
