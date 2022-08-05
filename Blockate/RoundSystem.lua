@@ -109,6 +109,10 @@ task.spawn(function()
             runCommand("!sound "..getNewSound())
         end
 
+        if workspace.Audio.SoundId == nil then
+            runCommand("!sound "..getNewSound())
+        end
+
         TInsert(Connections, workspace:WaitForChild("Audio").DidLoop:Connect(function()
             if debounce then return end
             debounce = true
