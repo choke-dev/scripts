@@ -36,7 +36,10 @@ local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-
 
 --[[ Variables ]]--
 local PAUSED = true
+local STOPPED = false
 local UPDATING = false
+local Connections = {}
+local TInsert = table.insert
 
 --[[ Functions ]]--
 local function runCommand(text)
@@ -75,6 +78,7 @@ end
 task.spawn(function()
     while true do
         task.wait()
+        if STOPPED then break end
         if UPDATING then repeat task.wait() until not UPDATING end
         if playerCount > 1 then
             PAUSED = false
@@ -101,19 +105,19 @@ task.spawn(function()
             runCommand("!sound "..getNewSound())
         end
 
-        workspace:WaitForChild("Audio").DidLoop:Connect(function()
+        TInsert(Connections, workspace:WaitForChild("Audio").DidLoop:Connect(function()
             if debounce then return end
             debounce = true
             local sound = getNewSound()
             print("Playing sound: "..sound)
             runCommand("!sound "..sound)
             debounce = false
-        end)
+        end))
     end) -- too lazy to figure out whats wrong
 end)
 
 task.spawn(function()
-    Players.LocalPlayer.Chatted:Connect(function(msg)
+    TInsert(Connections, Players.LocalPlayer.Chatted:Connect(function(msg)
         if msg == "/update" then
             UPDATING = true
             PAUSED = true
@@ -122,12 +126,22 @@ task.spawn(function()
             Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
             shout("✅ Events file updated!")
             UPDATING = false
+        elseif msg == "/stop" then
+            print("🛑 Stopping...")
+            STOPPED = true
+            for _,v in pairs(Connections) do
+                v:Disconnect()
+            end
+            Connections = {}
+            print("✅ Stopped!")
         end
-    end)
+    end))
 end)
 
 while true do
-    if PAUSED then repeat task.wait(3.1); shout([[
+    if STOPPED then break end
+    if PAUSED then repeat if STOPPED then break end task.wait(3.1);
+        shout([[
         ⏳
 
 
@@ -137,7 +151,9 @@ while true do
 
 
         Round paused. Waiting for players...
-        ]]) until not PAUSED end
+        ]]) 
+        until not PAUSED 
+    end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
     Events[eventStrings[math.random(1, eventCount)]]()
 end
