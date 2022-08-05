@@ -34,7 +34,7 @@ local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-
 local CheckPermModule = require(game:GetService("ReplicatedStorage").Modules.Client.Functions.CheckPerm)
 local FeedbackModule = require(game:GetService("ReplicatedStorage").Modules.Client.LocalCommands)
 
-if not CheckPermModule(2) then return FeedbackModule.feedback("You need admin perms to run this script.", "AlsoChat") end
+if not CheckPermModule(2) then return FeedbackModule.feedback("You need admin permissions to run this script.", "AlsoChat") end
 if getgenv().BRS_ALREADY_RAN then return FeedbackModule.feedback("Script is already running, if you wish to run a new instance please type \"/stop\".", "AlsoChat") end
 getgenv().BRS_ALREADY_RAN = true
 
