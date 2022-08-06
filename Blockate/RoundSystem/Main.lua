@@ -143,7 +143,7 @@ task.spawn(function()
             PAUSED = true
             shout("☁ Updating...")
             shout("📥 Fetching new events file...")
-            Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
+            Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/RoundSystem/Events.lua",true))()
             shout("✅ Events file updated!")
             UPDATING = false
         elseif msg == "/stop" then
