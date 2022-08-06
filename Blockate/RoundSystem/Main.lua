@@ -30,7 +30,7 @@ local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 
 --[[ Modules ]]--
-local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/Events.lua",true))()
+local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/RoundSystem/Events.lua",true))()
 local CheckPermModule = require(game:GetService("ReplicatedStorage").Modules.Client.Functions.CheckPerm)
 local FeedbackModule = require(game:GetService("ReplicatedStorage").Modules.Client.LocalCommands)
 
