@@ -153,7 +153,7 @@ task.spawn(function()
 end)
 
 while true do
-    if PAUSED then repeat if getgenv().INTERNAL_STOPPED then break end task.wait(3.1);
+    if PAUSED then repeat if getgenv().INTERNAL_STOPPED then break end task.wait(3.9);
         shout([[
         ⏳
 
