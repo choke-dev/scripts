@@ -103,6 +103,7 @@ end
 
 task.spawn(function()
     while true do
+        if getgenv().INTERNAL_STOPPED then break end
         task.wait(1)
         for i,v in pairs(BuilderPerm) do
             BuilderPerm[i] = v - 1

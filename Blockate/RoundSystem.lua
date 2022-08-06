@@ -37,10 +37,10 @@ local FeedbackModule = require(game:GetService("ReplicatedStorage").Modules.Clie
 if not CheckPermModule(2) then return FeedbackModule.feedback("You need admin permissions to run this script.", "AlsoChat") end
 if getgenv().BRS_ALREADY_RAN then return FeedbackModule.feedback("Script is already running, if you wish to run a new instance please type \"/stop\".", "AlsoChat") end
 getgenv().BRS_ALREADY_RAN = true
+getgenv().INTERNAL_STOPPED = false
 
 --[[ Variables ]]--
 local PAUSED = true
-local STOPPED = false
 local UPDATING = false
 local Connections = {}
 local TInsert = table.insert
@@ -82,7 +82,7 @@ end
 task.spawn(function()
     while true do
         task.wait()
-        if STOPPED then break end
+        if getgenv().INTERNAL_STOPPED then break end
         if UPDATING then repeat task.wait() until not UPDATING end
         if playerCount > 1 then
             PAUSED = false
@@ -136,7 +136,7 @@ task.spawn(function()
             UPDATING = false
         elseif msg == "/stop" then
             print("🛑 Stopping...")
-            STOPPED = true
+            getgenv().INTERNAL_STOPPED = true
             for _,v in pairs(Connections) do
                 v:Disconnect()
             end
@@ -148,8 +148,8 @@ task.spawn(function()
 end)
 
 while true do
-    if STOPPED then break end
-    if PAUSED then repeat if STOPPED then break end task.wait(3.1);
+    if getgenv().INTERNAL_STOPPED then break end
+    if PAUSED then repeat if getgenv().INTERNAL_STOPPED then break end task.wait(3.1);
         shout([[
         ⏳
 
