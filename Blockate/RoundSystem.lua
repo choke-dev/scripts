@@ -46,6 +46,17 @@ local Connections = {}
 local TInsert = table.insert
 
 --[[ Functions ]]--
+local function stopAll()
+    print("🛑 Stopping...")
+    getgenv().INTERNAL_STOPPED = true
+    for _,v in pairs(Connections) do
+        v:Disconnect()
+    end
+    Connections = {}
+    print("✅ Stopped!")
+    getgenv().BRS_ALREADY_RAN = false
+end
+
 local function runCommand(text)
     pcall(function()
         game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer(text)
@@ -135,14 +146,7 @@ task.spawn(function()
             shout("✅ Events file updated!")
             UPDATING = false
         elseif msg == "/stop" then
-            print("🛑 Stopping...")
-            getgenv().INTERNAL_STOPPED = true
-            for _,v in pairs(Connections) do
-                v:Disconnect()
-            end
-            Connections = {}
-            print("✅ Stopped!")
-            getgenv().BRS_ALREADY_RAN = false
+            stopAll()
         end
     end))
 end)
@@ -164,5 +168,6 @@ while true do
         until not PAUSED 
     end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
+    if not CheckPermModule(2) then FeedbackModule.feedback("You need admin permissions to continue running this script.", "AlsoChat"); stopAll(); break end
     Events[eventStrings[math.random(1, eventCount)]]()
 end
