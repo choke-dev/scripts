@@ -181,15 +181,15 @@ return {
     --[[ World Events ]]--
     ["MODIFY_GRAVITY"] = function()
         local gravity = countdown("The world gravity is changing!", 3)
-        for i = 1, 6 do
+        --[[for i = 1, 6 do
             shout("Choosing new world gravity: "..math.random(10, 200))
             task.wait(0.5)
-        end
+        end]]
         shout("New world gravity: "..gravity)
         runCommand("!gravity "..gravity)
     end,
     ["FLASHBANG"] = function()
-        countdown("FLASHBANG!", 2)
+        countdown("A flashbang is about to be thrown!", 2)
         task.spawn(function()
             runCommand("!filter brightness 1")
             for i = 0.9, 0, -0.1 do
