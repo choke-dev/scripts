@@ -77,13 +77,16 @@ local eventStrings = {}
 for _,v in pairs(Events) do
  eventCount += 1
 end
-Players.PlayerAdded:Connect(function()
+Players.PlayerAdded:Connect(function(plr)
+    if table.find(getgenv().BRS_Settings.BLACKLISTED_PLAYERS, plr.UserId) then return end
     playerCount += 1
 end)
-Players.PlayerRemoving:Connect(function()
+Players.PlayerRemoving:Connect(function(plr)
+    if table.find(getgenv().BRS_Settings.BLACKLISTED_PLAYERS, plr.UserId) then return end
     playerCount -= 1
 end)
 for _,v in pairs(Players:GetPlayers()) do
+    if table.find(getgenv().BRS_Settings.BLACKLISTED_PLAYERS, v.UserId) then continue end
     playerCount += 1
 end
 for i,_ in pairs(Events) do
@@ -96,7 +99,7 @@ task.spawn(function()
         task.wait()
         if getgenv().INTERNAL_STOPPED then break end
         if UPDATING then repeat task.wait() until not UPDATING end
-        if playerCount > 1 then
+        if playerCount > 0 then
             PAUSED = false
         else
             PAUSED = true
@@ -148,6 +151,12 @@ task.spawn(function()
             UPDATING = false
         elseif msg == "/stop" then
             stopAll()
+        elseif msg == "/updateplrcount" then
+            playerCount = 0
+            for _,v in pairs(Players:GetPlayers()) do
+                if table.find(getgenv().BRS_Settings.BLACKLISTED_PLAYERS, v.UserId) then continue end
+                playerCount += 1
+            end
         end
     end))
 end)
