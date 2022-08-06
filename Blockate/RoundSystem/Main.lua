@@ -27,7 +27,7 @@ getgenv().BRS_Settings = {
 
 --[[ Services ]]--
 local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
 
 --[[ Modules ]]--
 local Events = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/RoundSystem/Events.lua",true))()
@@ -129,7 +129,7 @@ task.spawn(function()
             if debounce then return end
             debounce = true
             local sound = getNewSound()
-            print("Playing sound: "..sound)
+            print("Playing sound: "..MarketplaceService:GetProductInfo(sound).Name)
             runCommand("!sound "..sound)
             debounce = false
         end))
@@ -153,7 +153,6 @@ task.spawn(function()
 end)
 
 while true do
-    if getgenv().INTERNAL_STOPPED then break end
     if PAUSED then repeat if getgenv().INTERNAL_STOPPED then break end task.wait(3.1);
         shout([[
         ⏳
@@ -170,5 +169,6 @@ while true do
     end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
     if not CheckPermModule(2) then FeedbackModule.feedback("You need admin permissions to continue running this script.", "AlsoChat"); stopAll(); break end
+    if getgenv().INTERNAL_STOPPED then break end
     Events[eventStrings[math.random(1, eventCount)]]()
 end
