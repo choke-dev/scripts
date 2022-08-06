@@ -48,6 +48,7 @@ local TInsert = table.insert
 --[[ Functions ]]--
 local function stopAll()
     print("🛑 Stopping...")
+    PAUSED = true
     getgenv().INTERNAL_STOPPED = true
     for _,v in pairs(Connections) do
         v:Disconnect()
