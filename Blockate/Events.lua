@@ -37,20 +37,22 @@ local function getTwoCorners(centerPosition:Vector3, size:number)
 end
 
 local function place(blockateposition, color, material)
-    -- i hate blockate coordinates
-    blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
-    
-    local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
-        ["Reflectance"] = 0,
-        ["CanCollide"] = true,
-        ["Color"] = color,
-        ["LightColor"] = Color3.new(1,1,1),
-        ["Transparency"] = 0,
-        ["Size"] = 2,
-        ["Material"] = material or math.random(0, 35),
-        ["Shape"] = 1,
-        ["Light"] = 0
-    })
+    task.spawn(function()
+        -- i hate blockate coordinates
+        blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
+        
+        local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
+            ["Reflectance"] = 0,
+            ["CanCollide"] = true,
+            ["Color"] = color,
+            ["LightColor"] = Color3.new(1,1,1),
+            ["Transparency"] = 0,
+            ["Size"] = 2,
+            ["Material"] = material or math.random(0, 35),
+            ["Shape"] = 1,
+            ["Light"] = 0
+        })
+    end)
 end
 
 local function fill(centerPosition:Vector3, radius:number, color:Color3, material:number)
