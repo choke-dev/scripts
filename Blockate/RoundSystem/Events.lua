@@ -59,6 +59,7 @@ local function fill(centerPosition:Vector3, radius:number, color:Color3, materia
     local x, y = getTwoCorners(centerPosition, ((radius - 1) * 2))
     for x1 = x.X, y.X, 4 do
         for z1 = x.Z, y.Z, 4 do
+            task.wait(0.02)
             place(Vector3.new(x1, centerPosition.Y - 4, z1), color, material)
         end
     end
