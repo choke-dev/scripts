@@ -223,3 +223,5 @@ function lol.copy(parts)
     writefile("BlockateCopydata.txt", HttpService:JSONEncode(saved))
     saved = {}
 end
+
+return lol
