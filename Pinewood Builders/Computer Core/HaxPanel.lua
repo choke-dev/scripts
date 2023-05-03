@@ -16,8 +16,6 @@ function findPartWithVector3Value(Position, Size)
     end
 end
 
-
-
 function tpClickReturn(Position, CD)
     reInitializeVariables()
     -- this function will modify the Position Y value by -4 to make sure the player is on the ground
