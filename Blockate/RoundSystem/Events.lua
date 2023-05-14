@@ -98,6 +98,10 @@ local function countdown(text, eventType)
     end
 end
 
+local function getRandomColor()
+	return BrickColor.new(Color3.fromRGB(math.random(0,255),math.random(0,255),math.random(0,255)))
+end
+
 local function whisper(plrName, message)
     game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w "..plrName.." "..message, "All")
 end
@@ -205,7 +209,7 @@ return {
         local target = countdown("A small plate will be placed on a random player.", 1)
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
-            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
         end)
@@ -214,7 +218,7 @@ return {
         local target = countdown("A plate will be placed on a random player.", 1)
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
-            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
             fill(HRPos, 3, randomcolor, randommaterial)
@@ -224,7 +228,7 @@ return {
         local target = countdown("A large plate will be placed on a random player.", 1)
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
-            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
             fill(HRPos, 5, randomcolor, randommaterial)
@@ -234,7 +238,7 @@ return {
         local target = countdown("A HUGE plate will be placed on a random player.", 1)
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
-            local randomcolor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
             fill(HRPos, 7, randomcolor, randommaterial)
