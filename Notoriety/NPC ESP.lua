@@ -1,21 +1,13 @@
+--[[
+         Notoriety
+      Dynamic NPC ESP
+       by @choke-dev
+]]
+
+
 -- Services
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-
--- PlaceIds
-local NotorietyUniverse = {
-    [2088934656] = function()
-        warn("Executing special function for Shadow Raid")
-        for _,v in ipairs(workspace.PoliceFolder:GetDescendants()) do
-            if v:IsA("Hat") and v.Name == "Lanyard" then
-                local Highlight = Instance.new("Highlight")
-                Highlight.Parent = v
-                Highlight.OutlineColor = Color3.fromRGB(255, 0, 255)
-                Highlight.FillTransparency = 1
-            end
-        end
-    end
-}
 
 -- Player
 local Player = Players.LocalPlayer
@@ -54,6 +46,26 @@ CitizensHighlight.Parent = CitizensHighlightModel
 PoliceHighlightModel.Parent = workspace.Police
 CitizensHighlightModel.Parent = workspace.Citizens
 
+-- PlaceIds
+local IgnoreNames = {
+    "GuardHighlightIgnore"
+}
+
+local NotorietyUniverse = {
+    [2088934656] = function()
+        warn("Executing special function for Shadow Raid")
+        for _,v in ipairs(PoliceFolder:GetDescendants()) do
+            if v:IsA("Hat") and v.Name == "Lanyard" then
+                v.Parent.Name = "GuardHighlightIgnore"
+                v.Parent.Parent = PoliceFolder
+                local Highlight = Instance.new("Highlight")
+                Highlight.Parent = v
+                Highlight.OutlineColor = Color3.fromRGB(255, 0, 255)
+                Highlight.FillTransparency = 1
+            end
+        end
+    end
+}
 
 function isNPCVisible(NPC)
     local Camera = workspace.CurrentCamera
@@ -64,7 +76,7 @@ function isNPCVisible(NPC)
     return IsVisible
 end
 
--- One-time items
+-- Special Functions
 local status, err = pcall(function()
     NotorietyUniverse[game.PlaceId]()
 end)
@@ -72,9 +84,9 @@ end)
 -- Main loop
 getgenv().NPC_SCAN = RunService.RenderStepped:Connect(function()
     for _, NPC in ipairs(PoliceFolder:GetDescendants()) do
-        if NPC:IsA("Model") and NPC:FindFirstChild("HumanoidRootPart") then
+        if NPC:IsA("Model") and NPC:FindFirstChild("HumanoidRootPart") and not table.find(IgnoreNames, NPC.Name) then
             if isNPCVisible(NPC) then
-                NPC.Parent = workspace.Police
+                NPC.Parent = PoliceFolder
             else
                 NPC.Parent = PoliceHighlightModel
             end
@@ -84,7 +96,7 @@ getgenv().NPC_SCAN = RunService.RenderStepped:Connect(function()
     for _, NPC in ipairs(CitizensFolder:GetDescendants()) do
         if NPC:IsA("Model") and NPC:FindFirstChild("HumanoidRootPart") then
             if isNPCVisible(NPC) then
-                NPC.Parent = workspace.Citizens
+                NPC.Parent = CitizensFolder
             else
                 NPC.Parent = CitizensHighlightModel
             end
