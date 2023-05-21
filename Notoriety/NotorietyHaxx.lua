@@ -57,9 +57,10 @@ table.sort(TitlesDropdown)
 
 --=[ Variables ]=--
 local Connections = {
-    ["CameraName_Signal"] = {
+    ["CameraDisabledName_Signal"] = {
         Debounce = false
-    }
+    },
+    ["DisabledCameras"] = {}
 }
 
 --=[ Remotes ]=--
@@ -87,10 +88,10 @@ local Window = Rayfield:CreateWindow({
 
 local Functions = {
     ["MainFunctions"] = function()
+        local CamerasFolder = workspace.Cameras
         local DisableCamsDebounce = false
         local PermanentlyDisabledCameras = false
         local UIElements = {}
-        local Connections_DisabledCameras = {}
         
 
         --// Main \\--
@@ -138,19 +139,19 @@ local Functions = {
                 if PermanentlyDisabledCameras and not DisableCamsDebounce then
                     DisableCamsDebounce = true
                     UIElements["Toggle_DisableCameras"]:Set(false)
-                    UINotify("Notoriety Haxx | Error", "Cameras are permanently disabled.", 6.5, 10747384394)
+                    UINotify("Notoriety Haxx | Notice", "Cameras are now permanently disabled.", 6.5, 10747384394)
                     DisableCamsDebounce = false
                     return
                 end
 
                 if not Value then
-                    for _,v in pairs(Connections_DisabledCameras) do
+                    for _,v in pairs(Connections["DisabledCameras"]) do
                         v:Disconnect()
                     end
-                    return table.clear(Connections_DisabledCameras) -- using table.remove() wont work since the index is shifted when removing
+                    return table.clear(Connections["DisabledCameras"]) -- using table.remove() wont work since the index is shifted when removing
                 end
 
-                for _,v in pairs(workspace.Cameras:GetChildren()) do
+                for _,v in pairs(CamerasFolder:GetChildren()) do
                     -- Name check
                     if v.Name == "Disabled" then
                         PermanentlyDisabledCameras = true
@@ -158,14 +159,16 @@ local Functions = {
                         return
                     end
 
-                    --[[
-                        Create an event to fire when any child of workspace.Camera changes its name to "Disabled"
-
-                        and run these functions
-                        UIElements["Toggle_DisableCameras"]:Set(false)
-                        UINotify("Notoriety Haxx | Notice", "Cameras have been permanently disabled.", 6.5, 10747384394)
-                    ]]
-                    
+                    CameraDisabledName_Signal = v:GetPropertyChangedSignal("Name"):Connect(function()
+                        if not Connections["CameraDisabledName_Signal"].Debounce and v.Name == "Disabled" then
+                            Connections["CameraDisabledName_Signal"].Debounce = true
+                            PermanentlyDisabledCameras = true
+                            UIElements["Toggle_DisableCameras"]:Set(false)
+                            Connections["CameraDisabledName_Signal"].Debounce = false
+                            CameraDisabledName_Signal:Disconnect()
+                            CameraDisabledName_Signal = nil
+                        end
+                    end)
 
                     -- Camera disable loop
                     local Camera_DisableProximityPrompt = v:FindFirstChild("Union"):FindFirstChild("ProximityPrompt")
@@ -174,7 +177,7 @@ local Functions = {
                             Remotes["CompleteInteraction"]:FireServer(Camera_DisableProximityPrompt)
                         end
                     end)
-                    table.insert(Connections_DisabledCameras, Camera_DisableLoop)
+                    table.insert(Connections["DisabledCameras"], Camera_DisableLoop)
                     Remotes["CompleteInteraction"]:FireServer(Camera_DisableProximityPrompt)
                 end
             end
