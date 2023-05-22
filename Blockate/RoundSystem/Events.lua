@@ -36,11 +36,25 @@ local function getTwoCorners(centerPosition:Vector3, size:number)
     return Vector3.new(x, y, z), Vector3.new(x2, y2, z2)
 end
 
+local getAxisString
+for i,v in pairs(getgc()) do
+    if type(v) == "function" and getfenv(v).script == game.ReplicatedStorage.Modules.BlockPosition then
+        if getinfo(v).name == "getAxisString" then
+            getAxisString = v
+        end
+    end
+end
+
+function toBlockateCoordinates(position)
+    return ("%s %s %s/0"):format(getAxisString(position.X), getAxisString(position.Y), getAxisString(position.Z))
+end 
+
 local function place(blockateposition, color, material)
     task.spawn(function()
         -- i hate blockate coordinates
-        blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
-        
+        --blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
+        blockateposition = toBlockateCoordinates(blockateposition)
+
         local args = {
             [1] = blockateposition,
             [2] = {
