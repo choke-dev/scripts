@@ -21,6 +21,10 @@ end
 
 
 local function shout(message)
+    -- url encode the whole message string
+    message = message:gsub("([^%w ])", function(c)
+        return ("%%%02X"):format(string.byte(c))
+    end)
     pcall(function()
         game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
     end)
@@ -229,10 +233,6 @@ return {
         end)
     end,
     ---[[[ Plate Events ]]]---
-    --[[
-
-    UNAVAILABLE UNTIL AN EXPLOIT WITH A DECOMPILER AND WEBSOCKET LIBRARY BYPASSES BYFRON
-
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown("A small plate will be placed on a random player.", 1)
         task.spawn(function()
@@ -272,7 +272,6 @@ return {
             fill(HRPos, 7, randomcolor, randommaterial)
         end)
     end,
-    ]]
 }
 
 --[[
