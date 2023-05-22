@@ -106,10 +106,7 @@ end
 
 local function countdown(text, eventType)
     for i = getgenv().BRS_Settings.COUNTDOWN, 0, -1 do
-        shout(([[
-        %s
-        %s
-        ]]):format(i,text))
+        shout(("[%s] %s"):format(i,text))
         task.wait(0.5)
     end
     shout("")
