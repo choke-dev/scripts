@@ -41,7 +41,24 @@ local function place(blockateposition, color, material)
         -- i hate blockate coordinates
         blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
         
-        local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
+        local args = {
+            [1] = blockateposition,
+            [2] = {
+                ["Reflectance"] = 0,
+                ["CanCollide"] = true,
+                ["Color"] = color,
+                ["LightColor"] = Color3.new(1,1,1),
+                ["Transparency"] = 0,
+                ["Size"] = 2,
+                ["Material"] = material or math.round(math.random(0, 35)),
+                ["Shape"] = 1,
+                ["Light"] = 0
+            }
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Place"):InvokeServer(unpack(args))
+
+        --[[local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
             ["Reflectance"] = 0,
             ["CanCollide"] = true,
             ["Color"] = color,
@@ -51,7 +68,7 @@ local function place(blockateposition, color, material)
             ["Material"] = material or math.random(0, 35),
             ["Shape"] = 1,
             ["Light"] = 0
-        })
+        })]]
     end)
 end
 
@@ -77,12 +94,6 @@ local function countdown(text, eventType)
     for i = getgenv().BRS_Settings.COUNTDOWN, 0, -1 do
         shout(([[
         %s
-
-
-
-
-
-
         %s
         ]]):format(i,text))
         task.wait(0.5)
