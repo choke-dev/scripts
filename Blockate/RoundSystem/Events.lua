@@ -19,29 +19,18 @@ local function runCommand(text)
     end)
 end
 
-
---=[ Url Encoder ]=--
-local char_to_hex = function(c)
-    return string.format("%%%02X", string.byte(c))
-end
-  
-local function urlencode(url)
-  if url == nil then
-    return
-  end
-  url = url:gsub("\n", "\r\n")
-  url = url:gsub("([^%w ])", char_to_hex)
-  url = url:gsub(" ", "+")
-  return url
-end
---=[ End Url Encode ]=--
-
 local function shout(message)
-    -- url encode the whole message string
-    message = urlencode(message)
-    pcall(function()
+
+    local args = {
+        [1] = message,
+        [2] = "All"
+    }
+    
+    game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest"):FireServer(unpack(args))    
+
+    --[[pcall(function()
         game:GetService("ReplicatedStorage").Sockets.Command:InvokeServer("!shout "..message)
-    end)
+    end)]]
 end
 
 local function getTwoCorners(centerPosition:Vector3, size:number)
@@ -67,42 +56,27 @@ function toBlockateCoordinates(position)
     return ("%s %s %s/0"):format(getAxisString(position.X), getAxisString(position.Y), getAxisString(position.Z))
 end 
 
-local function place(blockateposition, color, material)
+local function place(position, color, material)
     task.spawn(function()
         -- i hate blockate coordinates
-        blockateposition = tostring((math.round(blockateposition.X / 4)).." "..(math.round((blockateposition.Y) / 4)).."+ "..(math.round(blockateposition.Z / 4)).."/0")
-        --blockateposition = toBlockateCoordinates(blockateposition)
-
-	--[[
+        local blockateposition = (math.floor(position.X / 4).." "..math.floor(position.Y / 4).."+ "..math.floor(position.Z / 4).."/0")
+        
         local args = {
             [1] = blockateposition,
             [2] = {
                 ["Reflectance"] = 0,
                 ["CanCollide"] = true,
-                ["Color"] = color,
-                ["LightColor"] = Color3.fromRGB(248,248,248),
+                ["Color"] = Color3.fromRGB(242.0000159740448, 243.00001591444016, 243.00001591444016),
+                ["LightColor"] = Color3.fromRGB(242.0000159740448, 243.00001591444016, 243.00001591444016),
                 ["Transparency"] = 0,
                 ["Size"] = 2,
-                ["Material"] = material or math.round(math.random(0, 35)),
+                ["Material"] = 1,
                 ["Shape"] = 1,
                 ["Light"] = 0
             }
         }
 
-        game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Place"):InvokeServer(unpack(args))
-	]]
-
-        local block = game:GetService("ReplicatedStorage").Sockets.Edit.Place:InvokeServer(blockateposition, {
-            ["Reflectance"] = 0,
-            ["CanCollide"] = true,
-            ["Color"] = color,
-            ["LightColor"] = Color3.fromRGB(248,248,248),
-            ["Transparency"] = 0,
-            ["Size"] = 2,
-            ["Material"] = material or math.random(0, 35),
-            ["Shape"] = 1,
-            ["Light"] = 0
-        })
+        return game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Place"):InvokeServer(unpack(args))
     end)
 end
 
