@@ -259,7 +259,7 @@ return {
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[2], randommaterial)
-            fill(HRPos, 3, randomcolor, randommaterial)
+            fill(HRPos, 3, Colors[2], randommaterial)
         end)
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
@@ -270,7 +270,7 @@ return {
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[3], randommaterial)
-            fill(HRPos, 5, randomcolor, randommaterial)
+            fill(HRPos, 5, Colors[3], randommaterial)
         end)
     end,
     ["HUGE_PLATE_PLACED_ON_PLAYER"] = function()
@@ -281,7 +281,7 @@ return {
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
             place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[4], randommaterial)
-            fill(HRPos, 7, randomcolor, randommaterial)
+            fill(HRPos, 7, Colors[4], randommaterial)
         end)
     end,
 }
