@@ -104,6 +104,7 @@ local function countdown(text, eventType)
         task.wait(0.5)
     end]]
     shout(getgenv().BRS_Settings.COUNTDOWN.." seconds until: "..text)
+    task.wait(getgenv().BRS_Settings.COUNTDOWN)
 
     if eventType == 1 then
         return getRandomPlayer(), text
