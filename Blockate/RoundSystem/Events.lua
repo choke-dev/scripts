@@ -6,6 +6,12 @@ local GearIDs = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke
 
 --[[ Variables ]]--
 local BuilderPerm = {}
+local Colors = {
+    Color3.fromRGB(255, 89.00000229477882, 89.00000229477882),
+    Color3.fromRGB(245.00000059604645, 205.00000298023224, 48.000000938773155),
+    Color3.fromRGB(75.00000312924385, 151.00000619888306, 75.00000312924385),
+    Color3.fromRGB(82.00000271201134, 124.00000020861626, 174.00000482797623)
+}
 
 --[[ Functions ]]--
 local function round(number, decimalPlaces)
@@ -60,6 +66,7 @@ local function place(position, color, material)
     task.spawn(function()
         -- i hate blockate coordinates
         local blockateposition = (math.floor(position.X / 4).." "..math.floor(position.Y / 4).."+ "..math.floor(position.Z / 4).."/0")
+        
         
         local args = {
             [1] = blockateposition,
@@ -116,7 +123,7 @@ local function countdown(text, eventType)
 end
 
 local function getRandomColor()
-	return BrickColor.Random()
+	return BrickColor.new(Color3.fromRGB(math.random(0,255),math.random(0,255),math.random(0,255)))
 end
 
 local function whisper(plrName, message)
@@ -241,7 +248,7 @@ return {
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
-            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[1], randommaterial)
         end)
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
@@ -251,7 +258,7 @@ return {
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
-            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[2], randommaterial)
             fill(HRPos, 3, randomcolor, randommaterial)
         end)
     end,
@@ -262,7 +269,7 @@ return {
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
-            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[3], randommaterial)
             fill(HRPos, 5, randomcolor, randommaterial)
         end)
     end,
@@ -273,7 +280,7 @@ return {
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
             local randommaterial = math.random(1, 35)
-            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), randomcolor, randommaterial)
+            place(Vector3.new(HRPos.X, HRPos.Y - 4, HRPos.Z), Colors[4], randommaterial)
             fill(HRPos, 7, randomcolor, randommaterial)
         end)
     end,
