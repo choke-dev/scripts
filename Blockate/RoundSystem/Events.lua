@@ -154,49 +154,60 @@ return {
     ["RANDOM_PLAYER_KILLED"] = function()
         local target = countdown("A random player will die.", 1)
         runCommand("!kill "..target.Name)
+        shout("Killed "..target.Name)
     end,
     ["RANDOM_PLAYER_GETS_SWORD"] = function()
         local target = countdown("A random player will get a sword.", 1)
         runCommand("!gear "..target.Name.." sword")
+        shout(target.Name.." recieved a sword!")
     end,
     ["RANDOM_PLAYER_FLINGED"] = function()
         local target = countdown("A random player will be flung.", 1)
         runCommand("!fling "..target.Name)
+        shout(target.Name.." was flung!")
     end,
     ["RANDOM_PLAYER_TRIPPED"] = function()
         local target = countdown("A random player will be tripped.", 1)
         runCommand("!trip "..target.Name)
+        shout(target.Name.." was tripped!")
     end,
     ["RANDOM_PLAYER_BALLED"] = function()
         local target = countdown("A random player will be balled.", 1)
         runCommand("!ball "..target.Name)
+        shout(target.Name.." was balled!")
     end,
     ["RANDOM_PLAYER_HUBBED"] = function()
         if #Players:GetPlayers() < getgenv().BRS_Settings.EVENT_CONFIG.REQUIRED_AMOUNT_OF_PLAYERS_TO_ACTIVATE_HUB_EVENT then return end
         local target = countdown("A random player will be hubbed.", 1)
         runCommand("!hub "..target.Name)
+        shout(target.Name.." was hubbed!")
     end,
     ["RANDOM_PLAYER_RECIEVES_GEAR"] = function()
         local target = countdown("A random player will receive a random gear.", 1)
         runCommand("!gear "..target.Name.." "..GearIDs[math.random(1, #GearIDs)])
+        shout(target.Name.." recieved a random gear!")
     end,
     ["ALL_PLAYERS_TP_TO_PLAYER"] = function()
         local target = countdown("All players will be teleported to a random player.", 1)
         runCommand("!tp all "..target.Name)
+        shout("All players were teleported to "..target.Name.."!")
     end,
     ["RANDOM_PLAYER_RECIEVES_FLIGHT"] = function()
         local target = countdown("A random player will be given flight.", 1)
         runCommand("!fly "..target.Name)
+        shout(target.Name.." recieved flight!")
     end,
     ["RANDOM_PLAYER_RECIEVES_BUILDER"] = function()
         local target = countdown("A random player will be given [ 🔨 BUILDER ] permissions for [ "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." ] seconds.", 1)
         runCommand("!perm "..target.Name.." builder")
         if BuilderPerm[target.Name] then
             BuilderPerm[target.Name] += getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
-            whisper(target.Name, "🍀 Your builder permission timer has been extended by +60 seconds!")
+            whisper(target.Name, "🍀 Your builder permission timer has been extended by + 60 seconds!")
+            shout(target.Name.."'s builder permission timer has been extended by + 60 seconds!")
         else
             BuilderPerm[target.Name] = getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION
             whisper(target.Name, "🔨 You recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
+            shout(target.Name.." recieved builder permissions for "..getgenv().BRS_Settings.EVENT_CONFIG.BUILDER_PERM_DURATION.." seconds!")
         end
     end,
 
@@ -212,6 +223,7 @@ return {
     end,
     ["FLASHBANG"] = function()
         countdown("A flashbang is about to be thrown!", 2)
+        shout("BOOM!")
         task.spawn(function()
             runCommand("!filter brightness 1")
             for i = 0.9, 0, -0.1 do
@@ -224,6 +236,7 @@ return {
     ---[[[ Plate Events ]]]---
     ["SMALL_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown("A small plate will be placed on a random player.", 1)
+        shout("Placed a small plate on "..target.Name.."!")
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
@@ -233,6 +246,7 @@ return {
     end,
     ["PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown("A plate will be placed on a random player.", 1)
+        shout("Placed a plate on "..target.Name.."!")
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
@@ -243,6 +257,7 @@ return {
     end,
     ["LARGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown("A large plate will be placed on a random player.", 1)
+        shout("Placed a large plate on "..target.Name.."!")
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
@@ -253,6 +268,7 @@ return {
     end,
     ["HUGE_PLATE_PLACED_ON_PLAYER"] = function()
         local target = countdown("A HUGE plate will be placed on a random player.", 1)
+        shout("Placed a HUGE plate on "..target.Name.."!")
         task.spawn(function()
             local HRPos = target.Character.HumanoidRootPart.Position
             local randomcolor = getRandomColor()
