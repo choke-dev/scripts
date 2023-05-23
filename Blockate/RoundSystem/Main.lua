@@ -168,8 +168,9 @@ while true do
 
 
         Blockate Round System
-        built by choke-dev on github
-        v1.0.5
+        built by ????????? on github
+        v1.1.0
+        5 / 23 / 2023
 
 
         Round paused. Waiting for players...
