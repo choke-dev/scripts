@@ -99,11 +99,11 @@ local function getRandomPlayer()
 end
 
 local function countdown(text, eventType)
-    for i = getgenv().BRS_Settings.COUNTDOWN, 0, -1 do
+    --[[for i = getgenv().BRS_Settings.COUNTDOWN, 0, -1 do
         shout(("[%s] %s"):format(i,text))
         task.wait(0.5)
-    end
-    shout("")
+    end]]
+    shout(getgenv().BRS_Settings.COUNTDOWN.." seconds until: "..text)
 
     if eventType == 1 then
         return getRandomPlayer(), text
