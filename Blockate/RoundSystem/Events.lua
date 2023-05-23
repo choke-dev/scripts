@@ -66,8 +66,8 @@ local function place(position, color, material)
             [2] = {
                 ["Reflectance"] = 0,
                 ["CanCollide"] = true,
-                ["Color"] = Color3.fromRGB(242.0000159740448, 243.00001591444016, 243.00001591444016),
-                ["LightColor"] = Color3.fromRGB(242.0000159740448, 243.00001591444016, 243.00001591444016),
+                ["Color"] = color,
+                ["LightColor"] = color,
                 ["Transparency"] = 0,
                 ["Size"] = 2,
                 ["Material"] = 1,
