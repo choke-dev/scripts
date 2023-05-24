@@ -162,19 +162,11 @@ task.spawn(function()
 end)
 
 while true do
-    if PAUSED then repeat if getgenv().INTERNAL_STOPPED then break end task.wait(3.9);
-        shout([[
-        ⏳
-
-
-        Blockate Round System
-        built by ????????? on github
-        v1.1.0
-        5 / 23 / 2023
-
-
-        Round paused. Waiting for players...
-        ]]) 
+    if PAUSED then 
+        repeat 
+            if getgenv().INTERNAL_STOPPED then break end 
+            task.wait(3.9);
+            shout("Waiting for Players...") 
         until not PAUSED 
     end
     task.wait(getgenv().BRS_Settings.TIME_UNTIL_NEXT_EVENT)
