@@ -77,8 +77,9 @@ end
 
 --=[ Removes Highlights from Dead Players ]=--
 workspace.DebrisClient.PersistingDeathEffects.ChildAdded:Connect(function(Child)
-    local Murderer_Highlight = Child:FindFirstChild("Murderer_Highlight")
-    local Sheriff_Highlight  = Child:FindFirstChild("Sheriff_Highlight")
+    local Murderer_Highlight  = Child:FindFirstChild("Murderer_Highlight")
+    local Sheriff_Highlight   = Child:FindFirstChild("Sheriff_Highlight")
+    local Character_Highlight = Child:FindFirstChild("Character_Highlight")
 
     if Murderer_Highlight then
         Murderer_Highlight:Destroy()
@@ -86,6 +87,10 @@ workspace.DebrisClient.PersistingDeathEffects.ChildAdded:Connect(function(Child)
 
     if Sheriff_Highlight then
         Sheriff_Highlight:Destroy()
+    end
+
+    if Character_Highlight then
+        Character_Highlight:Destroy()
     end
 end)
 
