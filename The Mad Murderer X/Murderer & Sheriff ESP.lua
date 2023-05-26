@@ -13,18 +13,19 @@ local Services  = setmetatable({}, {
 
 local Players = Services.Players
 
-function DroppedGun_Handler()
-    -- workspace.Entities.DroppedGun.Handle
-    local DroppedGun = workspace.Entities:FindFirstChild("DroppedGun")
+function DroppedGun_Handler(Folder)
+    local DroppedGun_Connection
+    DroppedGun_Connection = Folder.ChildAdded:Connect(function(Child)
+        if Child.Name ~= "DroppedGun" then return end
 
-    if not DroppedGun then return end
-
-    local DroppedGun_Highlight_Instance            = Instance.new("Highlight")
-    DroppedGun_Highlight_Instance.Parent           = DroppedGun
-    DroppedGun_Highlight_Instance.Name             = "DroppedGun_Highlight"
-    DroppedGun_Highlight_Instance.FillTransparency = 1
-    DroppedGun_Highlight_Instance.OutlineColor     = Color3.new(0, 1, 0)
-    return DroppedGun_Highlight_Instance
+        local DroppedGun_Highlight_Instance            = Instance.new("Highlight") -- works fine but the highlight isnt showing
+        DroppedGun_Highlight_Instance.Parent           = Child.GunMesh
+        DroppedGun_Highlight_Instance.Name             = "DroppedGun_Highlight"
+        DroppedGun_Highlight_Instance.FillTransparency = 1
+        DroppedGun_Highlight_Instance.OutlineColor     = Color3.new(0, 1, 0)
+    end)
+    print("Added")
+    return DroppedGun_Connection
 end
 
 function AddESPHook(Character)
@@ -52,13 +53,20 @@ function AddESPHook(Character)
             Sheriff_Highlight_Instance.Name             = "Sheriff_Highlight"
             Sheriff_Highlight_Instance.FillTransparency = 1
             Sheriff_Highlight_Instance.OutlineColor     = Color3.new(0, 0, 1)
-            DroppedGun_Handler()
         end
     end)
     return ESPHook
 end 
 
+--=[ Gun ESP ]=--
+for _, Object in pairs(workspace:GetChildren()) do
+    if not Object:IsA("Folder") then continue end
+    if Object.Name ~= "Entities" then continue end
 
+    DroppedGun_Handler(Object)
+end
+
+--=[ Removes Highlights from Dead Players ]=--
 workspace.DebrisClient.PersistingDeathEffects.ChildAdded:Connect(function(Child)
     local Murderer_Highlight = Child:FindFirstChild("Murderer_Highlight")
     local Sheriff_Highlight  = Child:FindFirstChild("Sheriff_Highlight")
@@ -72,7 +80,7 @@ workspace.DebrisClient.PersistingDeathEffects.ChildAdded:Connect(function(Child)
     end
 end)
 
-
+--=[ Main ESP ]=--
 Players.PlayerAdded:Connect(function(Player)
     Player.CharacterAdded:Connect(function(Character)
         AddESPHook(Character)
