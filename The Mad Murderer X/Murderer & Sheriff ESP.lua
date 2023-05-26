@@ -1,5 +1,5 @@
 --[[
-    // Name: [The Mad Murderer X] Sheriff / Murderer ESP
+    // Name: [The Mad Murderer X] Sheriff / Murderer / Gun ESP
     // Author: choke#3588 <@208876506146013185>
     // Desc: "wish there was something else i can use"
     // Date: 2023/05/26 [YYYY/MM/DD]
@@ -18,13 +18,13 @@ function DroppedGun_Handler(Folder)
     DroppedGun_Connection = Folder.ChildAdded:Connect(function(Child)
         if Child.Name ~= "DroppedGun" then return end
 
-        local DroppedGun_Highlight_Instance            = Instance.new("Highlight") -- works fine but the highlight isnt showing
-        DroppedGun_Highlight_Instance.Parent           = Child.GunMesh
+        local DroppedGun_Highlight_Instance            = Instance.new("Highlight")
+        DroppedGun_Highlight_Instance.Parent           = Child
+        DroppedGun_Highlight_Instance.Adornee          = Child:WaitForChild("GunMesh")
         DroppedGun_Highlight_Instance.Name             = "DroppedGun_Highlight"
         DroppedGun_Highlight_Instance.FillTransparency = 1
         DroppedGun_Highlight_Instance.OutlineColor     = Color3.new(0, 1, 0)
     end)
-    print("Added")
     return DroppedGun_Connection
 end
 
@@ -55,7 +55,16 @@ function AddESPHook(Character)
             Sheriff_Highlight_Instance.OutlineColor     = Color3.new(0, 0, 1)
         end
     end)
-    return ESPHook
+
+    local Character_Highlight_Instance
+    Character_Highlight_Instance                  = Instance.new("Highlight")
+    Character_Highlight_Instance.Parent           = Character
+    Character_Highlight_Instance.Adornee          = Character
+    Character_Highlight_Instance.Name             = "Character_Highlight"
+    Character_Highlight_Instance.FillTransparency = 1
+    Character_Highlight_Instance.OutlineColor     = Color3.new(1, 1, 1)
+
+    return ESPHook, Character_Highlight_Instance
 end 
 
 --=[ Gun ESP ]=--
