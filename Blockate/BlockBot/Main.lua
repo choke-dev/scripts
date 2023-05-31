@@ -18,8 +18,8 @@ getgenv().BlockateBot_Settings = {
 --=[ ! DO NOT EDIT ANYTHING BELOW THIS LINE ! ]=--
 
 getgenv().BlockateBot_Internal = {
-    -- CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
-    CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))(),
+    CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
+    -- CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))(),
     Connections = {},
 }
 
