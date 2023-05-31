@@ -256,8 +256,8 @@ Commands["update"] = {
     ["Permission"] = 5,
     ["Function"] = function(Player, Args)
         sayMessage("Updating...", true)
-        -- getgenv().BlockateBot_Internal.CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Main.lua"))()
-        getgenv().BlockateBot_Internal.CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))()
+        getgenv().BlockateBot_Internal.CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Main.lua"))()
+        -- getgenv().BlockateBot_Internal.CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))()
     end
 }
 
