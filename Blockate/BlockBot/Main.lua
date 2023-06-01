@@ -12,14 +12,16 @@ getgenv().BlockateBot_Settings = {
     
     PermissionLevels = {
         [Services.Players.LocalPlayer.UserId] = 5
-    }
+    },
+
+    CHATGPT_API_KEY = "" -- join this server: https://discord.gg/pawan-krd-1055397662976905229, go to #bot, type /key and paste it here
 }
 
 --=[ ! DO NOT EDIT ANYTHING BELOW THIS LINE ! ]=--
 
 getgenv().BlockateBot_Internal = {
     CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
-    -- CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))(),
+    --CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))(),
     Connections = {},
 }
 
