@@ -7,6 +7,8 @@ local Services  = setmetatable({}, {
 --=[ Variables ]=--
 local Commands = {}
 local LocalPlayer = Services.Players.LocalPlayer
+local ChatGPT_Busy = false
+local ChatGPT_Timeout = false
 local PermissionDictionary = {
     [5] = "Owner",
     [4] = "Admin",
@@ -14,6 +16,9 @@ local PermissionDictionary = {
     [2] = "Whitelisted",
     [1] = "Guest",
 }
+
+--=[ Internal Functions ]=--
+request = request or syn.request or http_request or http.request
 
 --=[ Functions ]=--
 local function sayMessage(text, includeBotName, user)
@@ -122,7 +127,7 @@ Commands["sourcecode"] = {
 Commands["jump"] = {
     ["Permission"] = 2,
     ["Function"] = function(Player, Args)
-        sayMessage(Player.Name.." requested me to jump!", true)
+        sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to jump!", true)
         LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end
 }
@@ -159,8 +164,116 @@ Commands["read"] = {
     end
 }
 
+Commands["sit"] = {
+    ["Description"] = "Sits down.",
+    ["Usage"] = "sit",
+    ["Permission"] = 2,
+    ["Function"] = function(Player, Args)
+        sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to sit!", true)
+        LocalPlayer.Character.Humanoid.Sit = true
+    end
+}
+
+Commands["trip"] = {
+    ["Description"] = "Trips.",
+    ["Usage"] = "trip",
+    ["Permission"] = 2,
+    ["Function"] = function(Player, Args)
+        sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to trip!", true)
+        LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
+        LocalPlayer.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, math.random(-30, 30))
+    end
+}
 
 --=[ Trusted Commands ]=--
+Commands["follow"] = {
+    ["Description"] = "Follows <player>.",
+    ["Usage"] = "follow <player>",
+    ["Permission"] = 3,
+    ["Function"] = function(Player, Args)
+        local TargetPlayer = findPlayerByName(Args[1])
+        if not Args[1] then
+            sayMessage("Player was not specified.", true)
+            return
+        end
+
+        if not TargetPlayer then
+            sayMessage("Player was not found.", true)
+            return
+        end
+
+        if TargetPlayer == LocalPlayer then
+            sayMessage("You cannot follow yourself.", true)
+            return
+        end
+
+        if getgenv().BlockateBot_Internal.Connections["Follow"] then
+            sayMessage("I am already following someone. Please unfollow them first.", true)
+            return
+        end
+
+        sayMessage("Now following " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
+        local TargetCharacter = TargetPlayer.Character
+        local TargetHumanoid = TargetCharacter.Humanoid
+        local TargetHumanoidRootPart = TargetCharacter.HumanoidRootPart
+
+        local function follow()
+            if not TargetCharacter or not TargetHumanoid or not TargetHumanoidRootPart then
+                sayMessage("Target player is not alive.", true)
+                getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+                getgenv().BlockateBot_Internal.Connections["Follow"] = nil
+                return
+            end
+
+            local TargetPosition = TargetHumanoidRootPart.Position
+            local LocalPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            local Distance = (TargetPosition - LocalPosition).Magnitude
+
+            if Distance > 50 then
+                sayMessage("Target player is too far away.", true)
+                getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+                getgenv().BlockateBot_Internal.Connections["Follow"] = nil
+                return
+            end
+
+            LocalPlayer.Character.Humanoid:MoveTo(TargetPosition)
+        end
+
+
+
+        getgenv().BlockateBot_Internal.Connections["Follow"] = Services.RunService.Stepped:Connect(function()
+            follow()
+        end)
+    end
+}
+
+Commands["unfollow"] = {
+    ["Description"] = "Unfollows <player>.",
+    ["Usage"] = "unfollow <player>",
+    ["Permission"] = 3,
+    ["Function"] = function(Player, Args)
+        local TargetPlayer = findPlayerByName(Args[1])
+        if not Args[1] then
+            sayMessage("Player was not specified.", true)
+            return
+        end
+
+        if not TargetPlayer then
+            sayMessage("Player was not found.", true)
+            return
+        end
+
+        if TargetPlayer == LocalPlayer then
+            sayMessage("You cannot unfollow yourself.", true)
+            return
+        end
+
+        sayMessage("No longer following " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
+        getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+        getgenv().BlockateBot_Internal.Connections["Follow"] = nil
+    end
+}
+
 Commands["pathfind"] = {
     ["Description"] = "Pathfinds to <player>.",
     ["Usage"] = "pathfind <player>",
@@ -182,14 +295,62 @@ Commands["pathfind"] = {
             return
         end
 
-        local PathfindingService = Services.PathfindingService
-        local Path = PathfindingService:CreatePath()
-        Path:ComputeAsync(LocalPlayer.Character.HumanoidRootPart.Position, TargetPlayer.Character.HumanoidRootPart.Position)
-        local waypoints = Path:GetWaypoints()
-        for _, waypoint in pairs(waypoints) do
-            LocalPlayer.Character.Humanoid:MoveTo(waypoint.Position)
-            LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+        if getgenv().BlockateBot_Internal.Connections["Follow"] then
+            sayMessage("I cannot pathfind while following someone. Please unfollow them first.", true)
+            return
         end
+
+        sayMessage("Attempting to pathfind to " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
+        
+        local PathfindingService = Services.PathfindingService
+        local Path = PathfindingService:CreatePath({
+            AgentCanClimb = true;
+            AgentRadius = 2;
+            Costs = {
+                Climb = 2
+            }
+        })
+        local maxRetries = 3
+        local retries = 0
+        local blockedPath = false
+
+        while retries < maxRetries do
+            retries = retries + 1
+            local startPosition = LocalPlayer.Character.HumanoidRootPart.Position
+            local targetPosition = TargetPlayer.Character.HumanoidRootPart.Position
+        
+            Path:ComputeAsync(startPosition, targetPosition)
+            local waypoints = Path:GetWaypoints()
+            blockedPath = false
+        
+            Path.Blocked:Connect(function()
+                blockedPath = true
+            end)
+        
+            for _, waypoint in pairs(waypoints) do
+                if waypoint.Action == Enum.PathWaypointAction.Jump then
+                    LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            
+                if blockedPath then
+                    sayMessage("No path found.", true)
+                    return
+                end
+            
+                LocalPlayer.Character.Humanoid:MoveTo(waypoint.Position)
+                LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
+            end
+        
+            -- If the loop completes without getting blocked, break out of the retry loop
+            if not blockedPath then
+                break
+            end
+        end
+
+        if blockedPath then
+            sayMessage("No path found after multiple retries.", true)
+        end
+
     end
 }
 
@@ -203,6 +364,107 @@ Commands["reset"] = {
     end
 }
 
+Commands["friend"] = {
+    -- using setcore, send a friend req
+    ["Description"] = "Sends a friend request to <player>.",
+    ["Usage"] = "friend <player>",
+    ["Permission"] = 3,
+    ["Function"] = function(Player, Args)
+        local TargetPlayer = findPlayerByName(Args[1])
+        if not Args[1] then
+            sayMessage("Player was not specified.", true)
+            return
+        end
+
+        if not TargetPlayer then
+            sayMessage("Player was not found.", true)
+            return
+        end
+
+        if TargetPlayer == LocalPlayer then
+            sayMessage("You cannot friend yourself.", true)
+            return
+        end
+
+        LocalPlayer:RequestFriendship(TargetPlayer)
+        sayMessage("Sent a friend request to " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
+    end
+}
+
+Commands["chatgpt"] = {
+    ["Description"] = "Asks ChatGPT a question.",
+    ["Usage"] = "chatgpt <question>",
+    ["Permission"] = 3,
+    ["Function"] = function(Player, Args)
+        if getgenv().BlockateBot_Settings.CHATGPT_API_KEY == "" or nil then
+            return sayMessage("No ChatGPT API Key was provided.", true)
+        end
+
+        if ChatGPT_Busy then
+            return sayMessage("ChatGPT is busy. Please wait.", true)
+        end
+        ChatGPT_Busy = true
+
+        task.spawn(function()
+            task.wait(7.5)
+            if ChatGPT_Busy then
+                ChatGPT_Timeout = true
+                sayMessage("ChatGPT timed out. Please try again.", true)
+                ChatGPT_Busy = false
+            end
+        end)
+
+        sayMessage("Asking ChatGPT...", true)
+        table.remove(Args, 1)
+        local question = table.concat(Args, " ")
+
+        local URL_CHATGPT_API = "https://api.pawan.krd/v1/completions"
+        
+        local function sendRequest()
+            local response = request({
+                Url = URL_CHATGPT_API,
+                Method = "POST",
+                Headers = {
+                    ["Authorization"] = "Bearer "..getgenv().BlockateBot_Settings.CHATGPT_API_KEY,
+                    ["Content-Type"] = "application/json"
+                },
+                Body = game:GetService("HttpService"):JSONEncode({
+                    model = "text-davinci-003",
+                    prompt = "Human: " .. question .. "\\nAI:",
+                    temperature = 0.7,
+                    max_tokens = 75,
+                    stop = {
+                        "Human:",
+                        "AI:"
+                    }
+                })
+            })
+            return response
+        end
+
+        local response = sendRequest()
+        local responseTable = game:GetService("HttpService"):JSONDecode(response.Body)
+        local responseText = nil
+        
+        pcall(function()
+            responseText = responseTable.choices[1].text
+            responseText = responseText:gsub("%s+", " ")
+        end)
+
+        if not responseText then
+            sayMessage("ChatGPT did not return a response. Retrying...", true)
+            return sendRequest()
+        end
+
+        if #responseText > 150 then
+            responseText = responseText:sub(1, 147) .. "..."
+        end
+
+        sayMessage("[ ChatGPT ]" .. responseText, false)
+        ChatGPT_Busy = false
+    end
+}
+
 --=[ Owner Commands ]=--
 Commands["perm"] = {
     ["Description"] = "Sets the <permissionLevel> of <player>.",
@@ -211,6 +473,15 @@ Commands["perm"] = {
     ["Function"] = function(Player, Args)
         local TargetPlayer = findPlayerByName(Args[1])
         local permissionLevel = tonumber(Args[2])
+
+        if Args[1] == "all" then
+            for _, TargetPlayer in ipairs(Services.Players:GetPlayers()) do
+                if TargetPlayer == LocalPlayer then continue end
+                getgenv().BlockateBot_Settings.PermissionLevels[TargetPlayer.UserId] = permissionLevel
+            end
+            sayMessage("Successfully set everyone's permission level to: " .. PermissionDictionary[permissionLevel], true)
+            return
+        end
 
         if not Args[1] then
             sayMessage("Player was not specified.", true)
@@ -245,8 +516,9 @@ Commands["perm"] = {
             sayMessage("Successfully updated " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ")'s permission level to " .. PermissionDictionary[permissionLevel] .. ".", true)
         else
             PermissionTable[TargetPlayer.UserId] = permissionLevel
-            sayMessage("Successfully set " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ") permission level to: " .. PermissionDictionary[permissionLevel] .. ".", true)
+            sayMessage("Successfully set " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ")'s permission level to: " .. PermissionDictionary[permissionLevel] .. ".", true)
         end
+        sayMessage("Type .help to see the commands you have access to.", true)
     end
 }
 
@@ -257,7 +529,7 @@ Commands["update"] = {
     ["Function"] = function(Player, Args)
         sayMessage("Updating...", true)
         getgenv().BlockateBot_Internal.CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Main.lua"))()
-        -- getgenv().BlockateBot_Internal.CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))()
+        --getgenv().BlockateBot_Internal.CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))()
     end
 }
 
