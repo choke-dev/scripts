@@ -7,8 +7,17 @@ local Services  = setmetatable({}, {
 --=[ Variables ]=--
 local Commands = {}
 local LocalPlayer = Services.Players.LocalPlayer
-local ChatGPT_Busy = false
-local ChatGPT_Timeout = false
+local AIChatbot = {
+    ChatGPT = {
+        Timeout = false,
+        Busy = false
+    },
+    Bard = {
+        URL = "https://rest-api-debug.choke.repl.co/api/Bard/conversation/ask",
+        Timeout = false,
+        Busy = false
+    }
+}
 local PermissionDictionary = {
     [5] = "Owner",
     [4] = "Admin",
@@ -391,6 +400,7 @@ Commands["friend"] = {
     end
 }
 
+--[[
 Commands["chatgpt"] = {
     ["Description"] = "Asks ChatGPT a question.",
     ["Usage"] = "chatgpt <question>",
@@ -462,6 +472,65 @@ Commands["chatgpt"] = {
 
         sayMessage("[ ChatGPT ]" .. responseText, false)
         ChatGPT_Busy = false
+    end
+}
+]]
+
+Commands["bard"] = {
+    ["Description"] = "Asks Google Bard a question.",
+    ["Usage"] = "bard <question>",
+    ["Permission"] = 3,
+    ["Function"] = function(Player, Args)
+        if AIChatbot.Bard.Busy then
+            return sayMessage("Google Bard is busy. Please wait.", true)
+        end
+        AIChatbot.Bard.Busy = true
+
+        task.spawn(function()
+            task.wait(10)
+            if AIChatbot.Bard.Busy then
+                AIChatbot.Bard.Timeout = true
+                sayMessage("Google Bard timed out. Please try again.", true)
+                AIChatbot.Bard.Busy = false
+            end
+        end)
+
+        sayMessage("Asking Google Bard...", true)
+        table.remove(Args, 1)
+        local question = table.concat(Args, " ")
+
+        local function sendRequest()
+            local response = request({
+                Url = AIChatbot.Bard.URL,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                },
+                Body = game:GetService("HttpService"):JSONEncode({
+                    "question" = question
+                })
+            })
+            return response
+        end
+
+        local response = sendRequest()
+        local responseTable = game:GetService("HttpService"):JSONDecode(response.Body)
+        local responseText = responseTable.data.message
+        
+        responseText = responseText:gsub("%s+", " ")
+        if responseText == "" then responseText = nil end
+
+        if not responseText then
+            sayMessage("Google Bard did not return a response. Retrying...", true)
+            return sendRequest()
+        end
+
+        if #responseText > 150 then
+            responseText = responseText:sub(1, 147) .. "..."
+        end
+
+        sayMessage("[ Google Bard ]" .. responseText, false)
+        AIChatbot.Bard.Busy = false
     end
 }
 
