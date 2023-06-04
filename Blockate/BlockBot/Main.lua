@@ -14,14 +14,13 @@ getgenv().BlockateBot_Settings = {
         [Services.Players.LocalPlayer.UserId] = 5
     },
 
-    CHATGPT_API_KEY = "" -- join this server: https://discord.gg/pawan-krd-1055397662976905229, go to #bot, type /key and paste it here
+	DevMode = false
 }
 
 --=[ ! DO NOT EDIT ANYTHING BELOW THIS LINE ! ]=--
 
 getgenv().BlockateBot_Internal = {
-    CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
-    --CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))(),
+    CommandsTable = getgenv().BlockateBot_Settings.DevMode and loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))() or loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
     Connections = {},
 }
 
@@ -45,7 +44,7 @@ function commandHandler(user, message)
     local commandArgs = message:sub(#getgenv().BlockateBot_Settings.Commands_Prefix + #commandName + 2, #message):split(" ")
 
     local command = getgenv().BlockateBot_Internal.CommandsTable[commandName]
-    local permissionLevel = getgenv().BlockateBot_Settings.PermissionLevels[user.UserId]
+    local permissionLevel = getgenv().BlockateBot_Settings.PermissionLevels[user.UserId] or 0
 
     if not command then return end
     

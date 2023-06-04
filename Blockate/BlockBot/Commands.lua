@@ -507,7 +507,7 @@ Commands["bard"] = {
                     ["Content-Type"] = "application/json"
                 },
                 Body = game:GetService("HttpService"):JSONEncode({
-                    "question" = question
+                    question = question
                 })
             })
             return response
