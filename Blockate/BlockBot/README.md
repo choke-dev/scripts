@@ -8,7 +8,10 @@ feel free to give your suggestions / comments [here](https://github.com/choke-de
 3. Run the copied script
 4. Enjoy
 
+## WARNINGS
+- Please do not make alt accounts that have any connection to your main account.
+- I am not liable should you get banned from blockate.
+
+
 ## More people are now hosting BlockBot 😊, Thank you! (please remember to change the bot name thanks)
 ![image](https://github.com/choke-dev/scripts/assets/47597850/30079048-7185-4da9-9895-5d5e9b330998)
-![image](https://github.com/choke-dev/scripts/assets/47597850/def9ed17-a2f2-4f51-b94c-e0da75b102c9)
-![image](https://github.com/choke-dev/scripts/assets/47597850/ba62d2e8-e0a1-45c5-b7a9-a9fd9dc455a5)
