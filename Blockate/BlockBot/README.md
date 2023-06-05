@@ -4,8 +4,8 @@ feel free to give your suggestions / comments [here](https://github.com/choke-de
 
 ## HOW TO HOST YOUR OWN BlockBot™️
 1. Get a [script executor](https://fluxteam.net/)
-  1.1 Download LV Installer
-  1.2 Get a key by going through 3 Linkvertises (Use an Adblocker, Heres a free one: [UBlock Origin](https://ublockorigin.com/))
+1.1 Download LV Installer
+1.2 Get a key by going through 3 Linkvertises (Use an Adblocker, Heres a free one: [UBlock Origin](https://ublockorigin.com/))
 
 3. Copy [Main.lua](https://github.com/choke-dev/scripts/blob/main/Blockate/BlockBot/Main.lua) and adjust settings to your liking
 4. Execute the copied script
