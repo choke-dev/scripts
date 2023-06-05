@@ -1,3 +1,4 @@
+-- This file contains every roblox userid that has reported an instance of BlockBot to #blockate-reports.
 return {
   159671173 = {
     Timestamp = "1685909940"
