@@ -18,6 +18,10 @@ local AIChatbot = {
         Busy = false
     }
 }
+
+local Variables = {
+    ActivePathfindingID = nil
+}
 local PermissionDictionary = {
     [5] = "Owner",
     [4] = "Admin",
@@ -127,7 +131,7 @@ Commands["sourcecode"] = {
     ["Usage"] = "sourcecode",
     ["Permission"] = 1,
     ["Function"] = function(Player, Args)
-        sayMessage("Visit this link in your browser to view the source code: shlink.choke.dev/Blockate_BotSrc", true)
+        sayMessage("Visit this link in your browser to view the source code: shlink.choke.dev/Blockate_BotSrc", true, Player.Name)
     end
 }
 
@@ -138,6 +142,13 @@ Commands["jump"] = {
     ["Function"] = function(Player, Args)
         sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to jump!", true)
         LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+}
+
+Commands["dance"] = {
+    ["Permission"] = 2,
+    ["Function"] = function(Player, Args)
+        Services.Players:Chat("/e dance")
     end
 }
 
@@ -178,7 +189,6 @@ Commands["sit"] = {
     ["Usage"] = "sit",
     ["Permission"] = 2,
     ["Function"] = function(Player, Args)
-        sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to sit!", true)
         LocalPlayer.Character.Humanoid.Sit = true
     end
 }
@@ -188,7 +198,6 @@ Commands["trip"] = {
     ["Usage"] = "trip",
     ["Permission"] = 2,
     ["Function"] = function(Player, Args)
-        sayMessage(Player.DisplayName .. " (@" .. Player.Name .. ") requested me to trip!", true)
         LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.FallingDown)
         LocalPlayer.Character.HumanoidRootPart.AssemblyAngularVelocity = Vector3.new(0, 0, math.random(-30, 30))
     end
@@ -217,8 +226,7 @@ Commands["follow"] = {
         end
 
         if getgenv().BlockateBot_Internal.Connections["Follow"] then
-            sayMessage("I am already following someone. Please unfollow them first.", true)
-            return
+            return sayMessage("I am already following someone. Please unfollow them first.", true)
         end
 
         sayMessage("Now following " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
@@ -228,10 +236,9 @@ Commands["follow"] = {
 
         local function follow()
             if not TargetCharacter or not TargetHumanoid or not TargetHumanoidRootPart then
-                sayMessage("Target player is not alive.", true)
-                getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+                getgenv().BlockateBot_Internal.Connections["Follow"].Connection:Disconnect()
                 getgenv().BlockateBot_Internal.Connections["Follow"] = nil
-                return
+                return sayMessage("Target player is not alive.", true)
             end
 
             local TargetPosition = TargetHumanoidRootPart.Position
@@ -239,10 +246,9 @@ Commands["follow"] = {
             local Distance = (TargetPosition - LocalPosition).Magnitude
 
             if Distance > 50 then
-                sayMessage("Target player is too far away.", true)
-                getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+                getgenv().BlockateBot_Internal.Connections["Follow"].Connection:Disconnect()
                 getgenv().BlockateBot_Internal.Connections["Follow"] = nil
-                return
+                return sayMessage("Target player is too far away.", true)
             end
 
             LocalPlayer.Character.Humanoid:MoveTo(TargetPosition)
@@ -250,35 +256,27 @@ Commands["follow"] = {
 
 
 
-        getgenv().BlockateBot_Internal.Connections["Follow"] = Services.RunService.Stepped:Connect(function()
-            follow()
-        end)
+        getgenv().BlockateBot_Internal.Connections["Follow"] = {
+            ["Connection"] = Services.RunService.Stepped:Connect(follow),
+            ["TargetPlayer"] = TargetPlayer
+        }
     end
 }
 
 Commands["unfollow"] = {
-    ["Description"] = "Unfollows <player>.",
-    ["Usage"] = "unfollow <player>",
+    ["Description"] = "Stops following a player.",
+    ["Usage"] = "unfollow",
     ["Permission"] = 3,
     ["Function"] = function(Player, Args)
-        local TargetPlayer = findPlayerByName(Args[1])
-        if not Args[1] then
-            sayMessage("Player was not specified.", true)
+        if not getgenv().BlockateBot_Internal.Connections["Follow"] then
+            sayMessage("I am not following anyone.", true)
             return
         end
 
-        if not TargetPlayer then
-            sayMessage("Player was not found.", true)
-            return
-        end
-
-        if TargetPlayer == LocalPlayer then
-            sayMessage("You cannot unfollow yourself.", true)
-            return
-        end
+        local TargetPlayer = getgenv().BlockateBot_Internal.Connections["Follow"].TargetPlayer
 
         sayMessage("No longer following " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
-        getgenv().BlockateBot_Internal.Connections["Follow"]:Disconnect()
+        getgenv().BlockateBot_Internal.Connections["Follow"].Connection:Disconnect()
         getgenv().BlockateBot_Internal.Connections["Follow"] = nil
     end
 }
@@ -300,7 +298,7 @@ Commands["pathfind"] = {
         end
 
         if TargetPlayer == LocalPlayer then
-            sayMessage("You cannot pathfind to yourself.", true)
+            sayMessage("I cannot pathfind to myself!", true)
             return
         end
 
@@ -309,19 +307,45 @@ Commands["pathfind"] = {
             return
         end
 
+        -- Generate a GUID for this pathfinding instance
+        local GUID = Services.HttpService:GenerateGUID(false)
+
         sayMessage("Attempting to pathfind to " .. TargetPlayer.DisplayName .. " (@" .. TargetPlayer.Name .. ").", true)
-        
+
         local PathfindingService = Services.PathfindingService
+
+        local PathfindingModifiers = {}
+        local function createPathModifier(Parent)
+            local PathfindingModifier = Instance.new("PathfindingModifier")
+            PathfindingModifier.Label = "AvoidBlock"
+            PathfindingModifier.Parent = Parent
+            table.insert(PathfindingModifiers, PathfindingModifier)
+        end
+        
+        for _,v in pairs(workspace.Blocks:GetChildren()) do
+            if v:FindFirstChild("kill") then
+                createPathModifier(v)
+            end
+
+            if v:FindFirstChild("warp") then
+                createPathModifier(v)
+            end
+        end
+
         local Path = PathfindingService:CreatePath({
             AgentCanClimb = true;
-            AgentRadius = 2;
+            AgentRadius = 3;
             Costs = {
-                Climb = 2
+                Climb = 1,
+                Jump = 1,
+                AvoidBlock = math.huge
             }
         })
         local maxRetries = 3
         local retries = 0
         local blockedPath = false
+
+        Variables.ActivePathfindingID = GUID
 
         while retries < maxRetries do
             retries = retries + 1
@@ -335,23 +359,32 @@ Commands["pathfind"] = {
             Path.Blocked:Connect(function()
                 blockedPath = true
             end)
-        
+            
+            local LocalGUID = Variables.ActivePathfindingID
+
             for _, waypoint in pairs(waypoints) do
                 if waypoint.Action == Enum.PathWaypointAction.Jump then
                     LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
                 end
             
                 if blockedPath then
-                    sayMessage("No path found.", true)
-                    return
+                    sayMessage("No path found. Retrying... Attempt "..retries.."/"..maxRetries, true)
+                    continue
                 end
             
                 LocalPlayer.Character.Humanoid:MoveTo(waypoint.Position)
+            
+                if Variables.ActivePathfindingID ~= LocalGUID then
+                    sayMessage("Pathfinding cancelled.", true)
+                    return
+                end
+            
                 LocalPlayer.Character.Humanoid.MoveToFinished:Wait()
             end
         
             -- If the loop completes without getting blocked, break out of the retry loop
             if not blockedPath then
+                sayMessage("Pathfinding complete.", true)
                 break
             end
         end
@@ -359,7 +392,11 @@ Commands["pathfind"] = {
         if blockedPath then
             sayMessage("No path found after multiple retries.", true)
         end
-
+        
+        for _,v in pairs(workspace.Blocks:GetDescendants()) do
+            if not v:IsA("PathfindingModifier") then continue end
+            v:Destroy()
+        end
     end
 }
 
@@ -400,137 +437,67 @@ Commands["friend"] = {
     end
 }
 
---[[
-Commands["chatgpt"] = {
-    ["Description"] = "Asks ChatGPT a question.",
-    ["Usage"] = "chatgpt <question>",
-    ["Permission"] = 3,
-    ["Function"] = function(Player, Args)
-        if getgenv().BlockateBot_Settings.CHATGPT_API_KEY == "" or nil then
-            return sayMessage("No ChatGPT API Key was provided.", true)
-        end
-
-        if ChatGPT_Busy then
-            return sayMessage("ChatGPT is busy. Please wait.", true)
-        end
-        ChatGPT_Busy = true
-
-        task.spawn(function()
-            task.wait(7.5)
-            if ChatGPT_Busy then
-                ChatGPT_Timeout = true
-                sayMessage("ChatGPT timed out. Please try again.", true)
-                ChatGPT_Busy = false
-            end
-        end)
-
-        sayMessage("Asking ChatGPT...", true)
-        table.remove(Args, 1)
-        local question = table.concat(Args, " ")
-
-        local URL_CHATGPT_API = "https://api.pawan.krd/v1/completions"
-        
-        local function sendRequest()
-            local response = request({
-                Url = URL_CHATGPT_API,
-                Method = "POST",
-                Headers = {
-                    ["Authorization"] = "Bearer "..getgenv().BlockateBot_Settings.CHATGPT_API_KEY,
-                    ["Content-Type"] = "application/json"
-                },
-                Body = game:GetService("HttpService"):JSONEncode({
-                    model = "text-davinci-003",
-                    prompt = "Human: " .. question .. "\\nAI:",
-                    temperature = 0.7,
-                    max_tokens = 75,
-                    stop = {
-                        "Human:",
-                        "AI:"
-                    }
-                })
-            })
-            return response
-        end
-
-        local response = sendRequest()
-        local responseTable = game:GetService("HttpService"):JSONDecode(response.Body)
-        local responseText = nil
-        
-        pcall(function()
-            responseText = responseTable.choices[1].text
-            responseText = responseText:gsub("%s+", " ")
-        end)
-
-        if not responseText then
-            sayMessage("ChatGPT did not return a response. Retrying...", true)
-            return sendRequest()
-        end
-
-        if #responseText > 150 then
-            responseText = responseText:sub(1, 147) .. "..."
-        end
-
-        sayMessage("[ ChatGPT ]" .. responseText, false)
-        ChatGPT_Busy = false
-    end
-}
-]]
-
 Commands["bard"] = {
     ["Description"] = "Asks Google Bard a question.",
     ["Usage"] = "bard <question>",
     ["Permission"] = 3,
-    ["Function"] = function(Player, Args)
+    ["Function"] = function(Player, args)
+        -- Check if Bard is busy
         if AIChatbot.Bard.Busy then
-            return sayMessage("Google Bard is busy. Please wait.", true)
+          return sayMessage("Google Bard is busy. Please wait.", true)
         end
+    
         AIChatbot.Bard.Busy = true
-
-        task.spawn(function()
-            task.wait(10)
-            if AIChatbot.Bard.Busy then
-                AIChatbot.Bard.Timeout = true
-                sayMessage("Google Bard timed out. Please try again.", true)
-                AIChatbot.Bard.Busy = false
-            end
-        end)
+    
+        local question = table.concat(args, " ")
+    
+        local date = DateTime.now()
+        date = date:FormatLocalTime("L", "en-us")
 
         sayMessage("Asking Google Bard...", true)
-        table.remove(Args, 1)
-        local question = table.concat(Args, " ")
 
-        local function sendRequest()
-            local response = request({
-                Url = AIChatbot.Bard.URL,
-                Method = "POST",
-                Headers = {
-                    ["Content-Type"] = "application/json"
-                },
-                Body = game:GetService("HttpService"):JSONEncode({
-                    question = question
-                })
+        local response = request({
+            Url = AIChatbot.Bard.URL,
+            Method = "POST",
+            Headers = {
+              ["Content-Type"] = "application/json"
+            },
+            Body = game:GetService("HttpService"):JSONEncode({
+              question = question,
+              conversationId = date
             })
-            return response
-        end
-
-        local response = sendRequest()
+        })
+    
         local responseTable = game:GetService("HttpService"):JSONDecode(response.Body)
         local responseText = responseTable.data.message
-        
+    
+        -- Remove any whitespaces from the response text
         responseText = responseText:gsub("%s+", " ")
-        if responseText == "" then responseText = nil end
 
-        if not responseText then
-            sayMessage("Google Bard did not return a response. Retrying...", true)
-            return sendRequest()
-        end
-
+        -- If the response text is longer than 150 characters, truncate it
         if #responseText > 150 then
-            responseText = responseText:sub(1, 147) .. "..."
+          responseText = responseText:sub(1, 147) .. "..."
+        end
+    
+        sayMessage("[ Google Bard ] " .. responseText, false)
+    
+        AIChatbot.Bard.Busy = false
+    end
+}
+
+--=[ Admin Commands ]=--
+Commands["say"] = {
+    ["Description"] = "Says <message>.",
+    ["Usage"] = "say <message>",
+    ["Permission"] = 4,
+    ["Function"] = function(Player, Args)
+        if not Args[1] then
+            sayMessage("Message was not specified.", true)
+            return
         end
 
-        sayMessage("[ Google Bard ]" .. responseText, false)
-        AIChatbot.Bard.Busy = false
+        local message = table.concat(Args, " ")
+        sayMessage(message, true)
     end
 }
 
@@ -597,8 +564,7 @@ Commands["update"] = {
     ["Permission"] = 5,
     ["Function"] = function(Player, Args)
         sayMessage("Updating...", true)
-        getgenv().BlockateBot_Internal.CommandsTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Main.lua"))()
-        --getgenv().BlockateBot_Internal.CommandsTable = loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))()
+        CommandsTable = getgenv().BlockateBot_Settings.DevMode and loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))() or loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))()
     end
 }
 

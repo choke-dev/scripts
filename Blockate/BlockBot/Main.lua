@@ -1,3 +1,4 @@
+local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))();
 local Services  = setmetatable({}, {
     __index = function(self, key)
         return game.GetService(game, key)
@@ -20,11 +21,20 @@ getgenv().BlockateBot_Settings = {
 --=[ ! DO NOT EDIT ANYTHING BELOW THIS LINE ! ]=--
 
 getgenv().BlockateBot_Internal = {
+    ReportersTable = loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Reporters.lua"))(),
     CommandsTable = getgenv().BlockateBot_Settings.DevMode and loadstring(readfile(getgenv().BlockateBot_Settings.Commands_FilePath))() or loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Blockate/BlockBot/Commands.lua"))(),
     Connections = {},
 }
 
 --=[ Functions ]=--
+function notify(title, message) 
+    AkaliNotif.Notify({
+        Description = message;
+        Title = title;
+        Duration = 5;
+    });
+end
+
 function sayMessage(text, includeBotName, user)
     assert(type(text) == "string", "text must be a string")
 
@@ -69,12 +79,20 @@ function HookPlayerChat(Player)
     table.insert(getgenv().BlockateBot_Internal.Connections, PlayerChatted_Connection)
 end
 
+function checkReporter(Player)
+    if table.find(getgenv().BlockateBot_Internal.ReportersTable, Player.UserId) then
+        notify("⚠️ Warning ⚠️", Player.Name .. " is a known reporter!")
+    end
+end
+
 --=[ Hooks ]=--
 local PlayerAdded_Hook = Services.Players.PlayerAdded:Connect(function(Player)
+    checkReporter(Player)
     HookPlayerChat(Player)
 end)
 
 for _, Player in pairs(Services.Players:GetPlayers()) do
+    checkReporter(Player)
     HookPlayerChat(Player)
 end
 
