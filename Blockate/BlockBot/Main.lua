@@ -80,7 +80,7 @@ function HookPlayerChat(Player)
 end
 
 function checkReporter(Player)
-    if table.find(getgenv().BlockateBot_Internal.ReportersTable, Player.UserId) then
+    if getgenv().BlockateBot_Internal.ReportersTable[Player.UserId] then
         notify("⚠️ Warning ⚠️", Player.Name .. " is a known reporter!")
     end
 end
