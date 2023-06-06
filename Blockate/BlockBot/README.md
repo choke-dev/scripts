@@ -3,6 +3,8 @@ i made this script modular so anyone can host it
 feel free to give your suggestions / comments [here](https://github.com/choke-dev/scripts/issues/1)
 
 ## HOW TO HOST YOUR OWN BlockBot™️
+[Video Tutorial](https://youtu.be/pQjrw7FXbUE)
+
 1. Download a [script executor](https://fluxteam.net/external-files/Fluxus.zip)
 <br>1.1 Extract the .zip file
 <br>1.2 Run Fluxus
