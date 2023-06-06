@@ -28,6 +28,7 @@ local PermissionDictionary = {
     [3] = "Trusted",
     [2] = "Whitelisted",
     [1] = "Guest",
+    [0] = "Blacklisted"
 }
 
 --=[ Internal Functions ]=--
@@ -42,7 +43,8 @@ local function sayMessage(text, includeBotName, user)
     end
 
     if user then
-        Services.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(text, "To " .. user.Name)
+        print(user.Name)
+        Services.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer("/w "..user.Name.." "..text, "All")
     else
         Services.ReplicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(text, "All")
     end
@@ -203,6 +205,37 @@ Commands["trip"] = {
     end
 }
 
+Commands["calculate"] = {
+    ["Description"] = "Calculates <expression>.",
+    ["Usage"] = "calculate <expression>",
+    ["Permission"] = 2,
+    ["Function"] = function(Player, Args)
+        local expression = table.concat(Args, " ")
+        -- Safety checks
+        if not expression then
+            return sayMessage("Expression was not specified.", true)
+        end
+
+        -- Remove any non-numeric and non-operator characters from the expression
+        local sanitizedExpression = expression:gsub("[^%d%+%-*/%.()%s]", "")
+
+        -- Check if the sanitized expression is empty
+        if sanitizedExpression == "" then
+            return sayMessage("Invalid expression", true)
+        end
+
+        -- Attempt to load and execute the sanitized expression
+        local success, result = pcall(loadstring("return " .. sanitizedExpression))
+
+        -- Check for errors during execution
+        if success and type(result) == "number" then
+            return sayMessage("Result: " .. result, true)
+        else
+            return sayMessage("Illegal expression", true)
+        end
+    end
+}
+
 --=[ Trusted Commands ]=--
 Commands["follow"] = {
     ["Description"] = "Follows <player>.",
@@ -314,6 +347,9 @@ Commands["pathfind"] = {
 
         local PathfindingService = Services.PathfindingService
 
+        local AvoidAttributes = {
+            "kill", "warp", "baller", "poisoner", "damager", "tele", "stattele", "teamtele", "timetele", "tripper"
+        }
         local PathfindingModifiers = {}
         local function createPathModifier(Parent)
             local PathfindingModifier = Instance.new("PathfindingModifier")
@@ -323,11 +359,8 @@ Commands["pathfind"] = {
         end
         
         for _,v in pairs(workspace.Blocks:GetChildren()) do
-            if v:FindFirstChild("kill") then
-                createPathModifier(v)
-            end
-
-            if v:FindFirstChild("warp") then
+            for _, attribute in pairs(AvoidAttributes) do
+                if not v:FindFirstChild(attribute) then continue end
                 createPathModifier(v)
             end
         end
@@ -534,8 +567,8 @@ Commands["perm"] = {
             return
         end
 
-        if permissionLevel < 1 or permissionLevel > 4 then
-            sayMessage("Permission level must be between 1 and 4.", true)
+        if permissionLevel < 0 or permissionLevel > 4 then
+            sayMessage("Permission level must be between 0 and 4.", true)
             return
         end
 
