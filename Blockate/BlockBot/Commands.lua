@@ -131,7 +131,7 @@ Commands["sourcecode"] = {
     ["Usage"] = "sourcecode",
     ["Permission"] = 1,
     ["Function"] = function(Player, Args)
-        sayMessage("Visit this link in your browser to view the source code: shlink.choke.dev/Blockate_BotSrc", true, Player.Name)
+        sayMessage("Visit this link in your browser to view the source code: shlink.choke.dev/Blockate_BotSrc", true, Player)
     end
 }
 
