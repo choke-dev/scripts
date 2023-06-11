@@ -18,8 +18,8 @@ getgenv().CTF_Settings = {
         Color = BrickColor.new("Bright blue"),
     };
     Spectator = {
-        Name = "Spectators",
-        Color = BrickColor.new("Medium stone grey"),
+        Name = "Lobby",
+        Color = BrickColor.new("Dark stone grey"),
     };
 }
 
@@ -27,13 +27,16 @@ getgenv().CTF_Internal = {
     Team1 = {
         Flag = nil,
         DroppedFlag = nil,
+        DroppedFlag_Connection = nil,
         isFlagTaken = false
     },
     Team2 = {
         Flag = nil,
         DroppedFlag = nil,
+        DroppedFlag_Connection = nil,
         isFlagTaken = false
     },
+    matchOver = false
 }
 
 --[[ Services ]]--
@@ -102,10 +105,25 @@ local Materials = {
 
 -- [[ Functions ]]--
 local Feedback = require(ReplicatedStorage.Modules.Client.LocalCommands).feedback
+local CheckPerm = require(ReplicatedStorage.Modules.Client.Functions.CheckPerm)
+
+if not CheckPerm(2) then
+    return Feedback("You need [ Admin+ ] permissions to run this script properly.", "AlsoChat")
+end
 
 function RunCommand(command)
     ReplicatedStorage:WaitForChild("Sockets"):WaitForChild("Command"):InvokeServer(command)
 end
+
+function EditBlock(Attribute, Block, Value)
+    local args = {
+        [1] = Attribute,
+        [2] = Block,
+        [3] = Value
+    }
+    
+    game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("EditBlock"):FireServer(unpack(args))
+end    
 
 function Shout(Message)
     RunCommand("!shout "..Message)
@@ -211,7 +229,8 @@ function ResetGame()
     UpdateTeamName(getgenv().CTF_Settings.Team2.Color.Name, getgenv().CTF_Settings.Team2.Name)
 
     RunCommand("!team set all "..Teams[getgenv().CTF_Settings.Spectator.Name].TeamColor.Name)
-    RunCommand("!kill all")
+    RunCommand("!kill others")
+    getgenv().CTF_Internal.matchOver = false
 end
 
 function EvaluateTouched(Part)
@@ -242,71 +261,80 @@ end
 
 function HandlePlayerLeave(Player)
     if FlagCarriers.Team1 == Player then
-        FlagCarriers.Team2 = nil
-        isFlagTaken.Team2 = false
-        Shout(getgenv().CTF_Settings.Team2.Name .. "'s flag has been dropped and has been returned to their base!")
-        ToggleFlagVisibility(getgenv().CTF_Internal.Team2.Flag, true)
+        ReturnFlag("Team1", "Team2")
     end
 
     if FlagCarriers.Team2 == Player then
-        FlagCarriers.Team1 = nil
-        isFlagTaken.Team1 = false
-        Shout(getgenv().CTF_Settings.Team1.Name .. "'s flag has been dropped and has been returned to their base!")
-        ToggleFlagVisibility(getgenv().CTF_Internal.Team1.Flag, true)
+        ReturnFlag("Team2", "Team1")
     end
 end
 
 function HandlePlayerTeamChange(Player)
     local Connection = Player:GetPropertyChangedSignal("Team"):Connect(function()
         if FlagCarriers.Team1 == Player then
-            FlagCarriers.Team2 = nil
-            isFlagTaken.Team2 = false
-            Shout(getgenv().CTF_Settings.Team2.Name .. "'s flag has been dropped and has been returned to their base!")
-            ToggleFlagVisibility(getgenv().CTF_Internal.Team2.Flag, true)
+            ReturnFlag("Team1", "Team2")
         end
     
         if FlagCarriers.Team2 == Player then
-            FlagCarriers.Team1 = nil
-            isFlagTaken.Team1 = false
-            Shout(getgenv().CTF_Settings.Team1.Name .. "'s flag has been dropped and has been returned to their base!")
-            ToggleFlagVisibility(getgenv().CTF_Internal.Team1.Flag, true)
+            ReturnFlag("Team2", "Team1")
         end
     end)
 
     table.insert(getgenv().Connections, Connection)
 end
 
+function ReturnFlag(Team, OppositeTeam)
+    FlagCarriers[Team] = nil
+    isFlagTaken[Team] = false
+    Shout(getgenv().CTF_Settings[OppositeTeam].Name .. "'s flag has been returned to their base!")
+    ToggleFlagVisibility(getgenv().CTF_Internal[OppositeTeam].Flag, true)
+end
+
+function DropFlag(PlayerDeathPosition, Team)
+    local DroppedFlag = Place(PlayerDeathPosition, {
+        ["Reflectance"] = 0,
+        ["CanCollide"] = true,
+        ["Color"] = Colors[getgenv().CTF_Settings[Team].Color.Name],
+        ["LightColor"] = Colors[getgenv().CTF_Settings[Team].Color.Name],
+        ["Transparency"] = 0,
+        ["Size"] = 1,
+        ["Material"] = 1,
+        ["Shape"] = 29,
+        ["Light"] = 0
+    })
+    return DroppedFlag
+end
+
 function HandlePlayerDeath(Player)
     local PlayerCharacter = Player.Character
 
     local function PlayerDeath(PlayerTeam, OppositeTeam)
+
         FlagCarriers[PlayerTeam] = nil
+
+        local PlayerDeathPosition = PlayerCharacter:FindFirstChild("HumanoidRootPart").Position
+        local DroppedFlag = DropFlag(PlayerDeathPosition, OppositeTeam)
+        if not DroppedFlag then
+            return ReturnFlag(PlayerTeam, OppositeTeam)
+        end
+
         Shout(getgenv().CTF_Settings[OppositeTeam].Name .. "'s flag has been dropped!")
-        local DroppedFlag = Place(PlayerCharacter.HumanoidRootPart.Position, {
-            ["Reflectance"] = 0,
-            ["CanCollide"] = true,
-            ["Color"] = Colors[getgenv().CTF_Settings[OppositeTeam].Color.Name],
-            ["LightColor"] = Colors[getgenv().CTF_Settings[OppositeTeam].Color.Name],
-            ["Transparency"] = 0,
-            ["Size"] = 1,
-            ["Material"] = 1,
-            ["Shape"] = 29,
-            ["Light"] = 0
-        })
+
         local DroppedFlag_Connection = DroppedFlag.Touched:Connect(function(Hit)
             HandleFlagTouch(Hit, OppositeTeam, PlayerTeam, true, DroppedFlag)
         end)
         table.insert(getgenv().Connections, DroppedFlag_Connection)
+        getgenv().CTF_Internal[OppositeTeam].DroppedFlag_Connection = DroppedFlag_Connection
         getgenv().CTF_Internal[OppositeTeam].DroppedFlag = DroppedFlag
-        
-        -- Create a coroutine to wait for the flag to be returned
-        -- Cancel the coroutine if the flag is picked up by the opposite team or if the flag timer runs out
+
         task.spawn(function()
             local StartTime = tick()
             while true do
-                if FlagCarriers[OppositeTeam] then
-                    -- Flag has been picked up by the opposite team
-                    return
+                if FlagCarriers[PlayerTeam] then
+                    -- Flag has been picked up by team
+                    pcall(function()
+                        return Delete(DroppedFlag)
+                    end)
                 end
                 if tick() - StartTime >= getgenv().CTF_Settings.TimeUntilFlagReturn then
                     -- Flag has not been picked up by the opposite team
@@ -314,12 +342,20 @@ function HandlePlayerDeath(Player)
                     Delete(DroppedFlag)
                     return
                 end
-                task.wait()
+
+                EditBlock("sign", DroppedFlag, tostring(math.floor(getgenv().CTF_Settings.TimeUntilFlagReturn - (tick() - StartTime))) )
+                task.wait(1)
             end
         end)
     end
 
-    local Connection = PlayerCharacter:WaitForChild("Humanoid").Died:Connect(function()
+    -- check hum state if its dead
+    local DiedConnection
+    local CharacterRemovingConnection
+
+    DiedConnection = PlayerCharacter:WaitForChild("Humanoid").StateChanged:Connect(function(_OldState, NewState)
+        if NewState ~= Enum.HumanoidStateType.Dead then return end
+        -- check if flag carrier
         if FlagCarriers.Team1 == Player then
             PlayerDeath("Team1", "Team2")
         end
@@ -327,9 +363,28 @@ function HandlePlayerDeath(Player)
         if FlagCarriers.Team2 == Player then
             PlayerDeath("Team2", "Team1")
         end
+        CharacterRemovingConnection:Disconnect()
+        DiedConnection:Disconnect()
     end)
 
-    table.insert(getgenv().Connections, Connection)
+    -- detect if children removing from character
+    CharacterRemovingConnection = PlayerCharacter.ChildRemoved:Connect(function(Child)
+        if Child.Name ~= "HumanoidRootPart" then return end
+        -- check if flag carrier
+        
+        if FlagCarriers.Team1 == Player then
+            ReturnFlag("Team1", "Team2")
+        end
+
+        if FlagCarriers.Team2 == Player then
+            ReturnFlag("Team2", "Team1")
+        end
+        CharacterRemovingConnection:Disconnect()
+        DiedConnection:Disconnect()
+    end)
+
+    table.insert(getgenv().Connections, CharacterRemovingConnection)
+    table.insert(getgenv().Connections, DiedConnection)
 end
 
 function UpdateTeamName(TeamColorName, Name)
@@ -337,6 +392,8 @@ function UpdateTeamName(TeamColorName, Name)
 end
 
 function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagName: string, isDroppedFlag: boolean, droppedFlag: Instance)
+    if getgenv().CTF_Internal.matchOver then return end
+    
     local Player = EvaluateTouched(Hit)
 
     if not Player then return end
@@ -344,17 +401,18 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
     -- Is player alive?
     if not Player.Character then return end
     if Player.Character:FindFirstChild("Humanoid").Health <= 0 then return end
+    if Player.Character:FindFirstChild("Humanoid"):GetState() == Enum.HumanoidStateType.Dead then return end
 
     -- Check if player is on valid team
     local PlayerTeamColor = Player.Team.TeamColor
-    local Team1Color = getgenv().CTF_Settings[teamFlagName].Color
-    local Team2Color = getgenv().CTF_Settings[oppositeTeamFlagName].Color
-    if PlayerTeamColor ~= Team1Color and PlayerTeamColor ~= Team2Color then
+    local AllyTeam = getgenv().CTF_Settings[teamFlagName].Color
+    local EnemyTeam = getgenv().CTF_Settings[oppositeTeamFlagName].Color
+    if PlayerTeamColor ~= AllyTeam and PlayerTeamColor ~= EnemyTeam then
         return
     end
 
     -- Check if opposite team
-    if Player.Team.TeamColor ~= Team1Color then
+    if Player.Team.TeamColor == EnemyTeam then
         -- Check if flag is being carried by opposite team
         if FlagCarriers[oppositeTeamFlagName] then
             return
@@ -368,7 +426,7 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         -- Flag is not being carried
         FlagCarriers[oppositeTeamFlagName] = Player
         isFlagTaken[oppositeTeamFlagName] = true
-        Shout(Player.Name .. " has taken " .. getgenv().CTF_Settings[teamFlagName].Name .. "'s flag!")
+        Shout("[🏴] "..Player.DisplayName .. " has taken " .. getgenv().CTF_Settings[teamFlagName].Name .. "'s flag!")
         ToggleFlagVisibility(getgenv().CTF_Internal[teamFlagName].Flag, false)
 
         if isDroppedFlag then
@@ -379,7 +437,7 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         return
     end
 
-    if Player.Team.TeamColor == Team1Color then
+    if Player.Team.TeamColor == AllyTeam then
         -- Check if flag is being carried
         if not FlagCarriers[teamFlagName] then
             return
@@ -397,12 +455,12 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         -- Flag carrier is player
         FlagCarriers[teamFlagName] = nil
         isFlagTaken[teamFlagName] = false
-        Shout(Player.Name .. " has captured " .. getgenv().CTF_Settings[oppositeTeamFlagName].Name .. "'s flag!")
+        Shout("[🏁] "..Player.DisplayName .. " has captured " .. getgenv().CTF_Settings[oppositeTeamFlagName].Name .. "'s flag!")
         ToggleFlagVisibility(getgenv().CTF_Internal[oppositeTeamFlagName].Flag, true)
         FlagCaptures[teamFlagName] = FlagCaptures[teamFlagName] + 1
 
         if FlagCaptures[teamFlagName] >= getgenv().CTF_Settings.CaptureLimit then
-            -- TEAMNAME has won the game!
+            getgenv().CTF_Internal.matchOver = true
             Shout(getgenv().CTF_Settings[teamFlagName].Name .. " has won the game!")
             UpdateTeamName(Player.Team.TeamColor.Name, getgenv().CTF_Settings[teamFlagName].Name .. " (WINNER)")
             task.wait(5)
