@@ -224,6 +224,10 @@ function ResetGame()
     FlagCarriers.Team1 = nil
     FlagCarriers.Team2 = nil
 
+    -- Reset Flag Visibility
+    ToggleFlagVisibility(getgenv().CTF_Internal.Team1.Flag, true)
+    ToggleFlagVisibility(getgenv().CTF_Internal.Team2.Flag, true)
+
     -- reset team names
     UpdateTeamName(getgenv().CTF_Settings.Team1.Color.Name, getgenv().CTF_Settings.Team1.Name)
     UpdateTeamName(getgenv().CTF_Settings.Team2.Color.Name, getgenv().CTF_Settings.Team2.Name)
@@ -320,8 +324,14 @@ function HandlePlayerDeath(Player)
 
         Shout(getgenv().CTF_Settings[OppositeTeam].Name .. "'s flag has been dropped!")
 
-        local DroppedFlag_Connection = DroppedFlag.Touched:Connect(function(Hit)
-            HandleFlagTouch(Hit, OppositeTeam, PlayerTeam, true, DroppedFlag)
+        -- use gettouchingparts to detect if the flag is picked up
+        local DroppedFlag_Connection = RunService.RenderStepped:Connect(function()
+            local DroppedFlagParts = DroppedFlag:GetTouchingParts()
+
+            for _, Part in pairs(DroppedFlagParts) do
+                HandleFlagTouch(Part, OppositeTeam, PlayerTeam, true, DroppedFlag)
+            end
+
         end)
         table.insert(getgenv().Connections, DroppedFlag_Connection)
         getgenv().CTF_Internal[OppositeTeam].DroppedFlag_Connection = DroppedFlag_Connection
@@ -426,6 +436,7 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         -- Flag is not being carried
         FlagCarriers[oppositeTeamFlagName] = Player
         isFlagTaken[oppositeTeamFlagName] = true
+        print("[ "..getgenv().CTF_Settings[oppositeTeamFlagName].Name.." ] "..Player.DisplayName.." took "..getgenv().CTF_Settings[teamFlagName].Name.."'s flag!")
         Shout("[🏴] "..Player.DisplayName .. " has taken " .. getgenv().CTF_Settings[teamFlagName].Name .. "'s flag!")
         ToggleFlagVisibility(getgenv().CTF_Internal[teamFlagName].Flag, false)
 
@@ -455,6 +466,7 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         -- Flag carrier is player
         FlagCarriers[teamFlagName] = nil
         isFlagTaken[teamFlagName] = false
+        print("[ "..getgenv().CTF_Settings[teamFlagName].Name.." ] "..Player.DisplayName.." captured "..getgenv().CTF_Settings[oppositeTeamFlagName].Name.."'s flag!")
         Shout("[🏁] "..Player.DisplayName .. " has captured " .. getgenv().CTF_Settings[oppositeTeamFlagName].Name .. "'s flag!")
         ToggleFlagVisibility(getgenv().CTF_Internal[oppositeTeamFlagName].Flag, true)
         FlagCaptures[teamFlagName] = FlagCaptures[teamFlagName] + 1
@@ -484,13 +496,21 @@ end
 --[[ Main ]]--
 getgenv().CTF_Internal.Team1.Flag, getgenv().CTF_Internal.Team2.Flag = GameSetup()
 
--- Start hooking on flags
-local Team1Flag_Connection = getgenv().CTF_Internal.Team1.Flag.Touched:Connect(function(Hit)
-    HandleFlagTouch(Hit, "Team1", "Team2")
-end)
+-- Start handling flag touches
+local FlagGetTouchingParts_Connection = RunService.RenderStepped:Connect(function()
+    local Team1Flag = getgenv().CTF_Internal.Team1.Flag
+    local Team2Flag = getgenv().CTF_Internal.Team2.Flag
 
-local Team2Flag_Connection = getgenv().CTF_Internal.Team2.Flag.Touched:Connect(function(Hit)
-    HandleFlagTouch(Hit, "Team2", "Team1")
+    local Team1FlagParts = Team1Flag:GetTouchingParts()
+    local Team2FlagParts = Team2Flag:GetTouchingParts()
+
+    for _, Part in pairs(Team1FlagParts) do
+        HandleFlagTouch(Part, "Team1", "Team2")
+    end
+
+    for _, Part in pairs(Team2FlagParts) do
+        HandleFlagTouch(Part, "Team2", "Team1")
+    end
 end)
 
 local FlagDestroyed_Connection = workspace.Blocks.ChildRemoved:Connect(function(Child)
@@ -541,7 +561,7 @@ for _, Player in pairs(Players:GetChildren()) do
 end
 
 table.insert(getgenv().Connections, Team1Flag_Connection)
-table.insert(getgenv().Connections, Team2Flag_Connection)
+table.insert(getgenv().Connections, FlagGetTouchingParts_Connection)
 table.insert(getgenv().Connections, PlayerAdded_Connection)
 table.insert(getgenv().Connections, PlayerDisconnected_Connection)
 
