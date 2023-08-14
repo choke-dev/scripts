@@ -1,5 +1,8 @@
 --[[
 
+          ⚠️ WARNING ⚠️
+    i would advise not using this
+
     Blockate Anti-Grief
 
     This Script Prevents These Types of Griefing:
@@ -12,8 +15,6 @@
     1. Run !logs
     2. Run script
     3. Enjoy
-
-    made with a 🔥 passion and 💖
 ]]
 
 -- // Configuration \\ --
