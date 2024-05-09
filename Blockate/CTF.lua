@@ -7,6 +7,7 @@ end)
 
 getgenv().CTF_Settings = {
     TimeUntilFlagReturn = 30,
+    TimeUntilRestart = 10,
     CaptureLimit = 3,
 
     Team1 = {
@@ -14,7 +15,7 @@ getgenv().CTF_Settings = {
         Color = BrickColor.new("Bright red"),
     };
     Team2 = {
-        Name = "BLU",
+        Name = "BLUE",
         Color = BrickColor.new("Bright blue"),
     };
     Spectator = {
@@ -112,7 +113,9 @@ if not CheckPerm(2) then
 end
 
 function RunCommand(command)
-    ReplicatedStorage:WaitForChild("Sockets"):WaitForChild("Command"):InvokeServer(command)
+    pcall(function()
+            ReplicatedStorage:WaitForChild("Sockets"):WaitForChild("Command"):InvokeServer(command)
+    end)
 end
 
 function EditBlock(Attribute, Block, Value)
@@ -122,7 +125,9 @@ function EditBlock(Attribute, Block, Value)
         [3] = Value
     }
     
-    game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("EditBlock"):FireServer(unpack(args))
+    pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("EditBlock"):FireServer(unpack(args))
+    end)
 end    
 
 function Shout(Message)
@@ -135,7 +140,9 @@ function Place(Position, Properties)
 end
 
 function Delete(Block)
-    ReplicatedStorage:WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Delete"):FireServer(Block)
+    pcall(function()
+            ReplicatedStorage:WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Delete"):FireServer(Block)
+    end)
 end
 
 function PaintBlock(Block, Properties, PropertiesToChange)
@@ -151,7 +158,9 @@ function PaintBlock(Block, Properties, PropertiesToChange)
         }
     }
     
-    game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Paint"):FireServer(unpack(args))
+    pcall(function()
+        game:GetService("ReplicatedStorage"):WaitForChild("Sockets"):WaitForChild("Edit"):WaitForChild("Paint"):FireServer(unpack(args))
+    end)
 end
 
 function GameSetup()
@@ -212,6 +221,8 @@ function GameSetup()
         v:Destroy()
     end
 
+    Feedback("Game setup complete", "AlsoChat")
+    
     return Team1Flag, Team2Flag
 end
 
@@ -437,7 +448,7 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
         FlagCarriers[oppositeTeamFlagName] = Player
         isFlagTaken[oppositeTeamFlagName] = true
         print("[ "..getgenv().CTF_Settings[oppositeTeamFlagName].Name.." ] "..Player.DisplayName.." took "..getgenv().CTF_Settings[teamFlagName].Name.."'s flag!")
-        Shout("[🏴] "..Player.DisplayName .. " has taken " .. getgenv().CTF_Settings[teamFlagName].Name .. "'s flag!")
+        Shout("Player.DisplayName .. " has taken " .. getgenv().CTF_Settings[teamFlagName].Name .. "'s flag!")
         ToggleFlagVisibility(getgenv().CTF_Internal[teamFlagName].Flag, false)
 
         if isDroppedFlag then
@@ -476,10 +487,10 @@ function HandleFlagTouch(Hit: Instance, teamFlagName: string, oppositeTeamFlagNa
             Shout(getgenv().CTF_Settings[teamFlagName].Name .. " has won the game!")
             UpdateTeamName(Player.Team.TeamColor.Name, getgenv().CTF_Settings[teamFlagName].Name .. " (WINNER)")
             task.wait(5)
-            Shout("Game restart in: ")
-            for i = 10, 0, -1 do
-                Shout("[ "..i.." ]")
-                task.wait(1)
+
+            for i = getgenv().CTF_Settings.TimeUntilRestart, 0, -1 do
+                Shout(`Game restarting in: {i}`)
+                task.wait(0.5)
             end
             ResetGame()
             return
@@ -564,9 +575,3 @@ table.insert(getgenv().Connections, Team1Flag_Connection)
 table.insert(getgenv().Connections, FlagGetTouchingParts_Connection)
 table.insert(getgenv().Connections, PlayerAdded_Connection)
 table.insert(getgenv().Connections, PlayerDisconnected_Connection)
-
---[[
-    for _, Connection in pairs(getgenv().Connections) do
-        Connection:Disconnect()
-    end
-]]
