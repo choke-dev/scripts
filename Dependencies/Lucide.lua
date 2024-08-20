@@ -8,8 +8,7 @@ export type Asset = {
     ImageRectOffset: Vector2, -- Vector2.new(648, 266)
 }
 
-local Icons = require(script.Icons)
-local VersionInfo = require(script.VersionInfo)
+local Icons = require( loadstring(game:HttpGet("https://raw.githubusercontent.com/choke-dev/scripts/main/Dependencies/LucideIcons.lua"))() )
 
 local Type = typeof or type
 local function CheckArgTypes(funcName: string, inputArgs: {any}, typeEntries: {[number]: {string}})
@@ -46,11 +45,7 @@ local function ApplyToInstance(object: Instance, properties: {[string]: any}): I
     return object
 end
 
--- See /version-info.luau
-local Lucide = {
-    PackageVersion = VersionInfo.PackageVersion,
-    LucideVersion = VersionInfo.LucideVersion,
-}
+local Lucide = {}
 
 -- Add all icon names to an array
 do
