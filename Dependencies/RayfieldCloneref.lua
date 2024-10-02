@@ -9,7 +9,7 @@ iRay  | Programming
 ]]
 
 local cloneref = cloneref or function(o) return o end
-COREGUI = cloneref(game:GetService("COREGUI"))
+COREGUI = cloneref(game:GetService("CoreGui"))
 
 local Release = "Beta 8"
 local NotificationDuration = 6.5
